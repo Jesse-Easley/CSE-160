@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Draw a blue rectangle (canvas version)</title>
+
+    <script src="asg0.js"></script>
+    <script src="lib/cuon-matrix-cse160.js"></script>
+</head>
+
+<body onload="main()">
+    <canvas id="example" width="400" height="400" style="background-color: black; display:block; margin-bottom: 5px;"> Please use a browser that supports "canvas"</canvas>
+    
+    <div id="vecInput">
+        <div style="margin: 2px">
+            <label>v1:</label>
+            <label>x <input type="text" id="v1x"></label>
+            <label>y <input type="text" id="v1y"></label>
+        </div>
+        <div style="margin: 2px">
+            <label>v2:</label>
+            <label>x <input type="text" id="v2x"></label>
+            <label>y <input type="text" id="v2y"></label>
+        </div>
+
+        <div style="margin: 2px;">
+            <input type="button" value="Draw" id="drawBtn">
+        </div>
+    </div>
+    <div id="opInput" style="margin-top: 10px;">
+        <label>Operation:</label>
+        <select id="opSelect">
+            <option value="add">Add</option>
+            <option value="sub">Subtract</option>
+            <option value="mul">Multiply</option>
+            <option value="div">Divide</option>
+            <option value="mag">Magnitude</option>
+            <option value="norm">Normalize</option>
+            <option value="angle">Angle Between</option>
+        </select>
+        <label>Scalar: <input type="text" id="opScalar"></label>
+        <div style="margin: 2px;">
+            <input type="button" value="Draw" id="opBtn">
+        </div>
+
+    </div>
+</body>
+</html>
