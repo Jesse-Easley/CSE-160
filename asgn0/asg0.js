@@ -64,6 +64,12 @@ function handleDrawOperationEvent(){
         drawVector(v2.normalize(), 'green');
     }
     else if(op == 'angle'){
-        console.log(Math.acos(Vector3.dot(v1, v2)/(v1.magnitude() * v2.magnitude())) * (180/(Math.PI)))
+        console.log(angleBetween(v1, v2));
     }
+}
+
+function angleBetween(v1, v2){
+    let dot = Vector3.dot(v1, v2);
+    let radAngle = Math.acos(dot/(v1.magnitude() * v2.magnitude()))
+    return radAngle * (180/(Math.PI));
 }
