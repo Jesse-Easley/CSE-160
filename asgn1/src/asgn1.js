@@ -24,7 +24,7 @@ function setupWebGL(){
     canvas = document.getElementById('webgl');
 
     //gets rendering context for WebGL
-    gl = getWebGLContext(canvas);
+    gl = getWebGLContext(canvas, {preserveDrawingBuffer: true});
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
         return;
@@ -80,6 +80,7 @@ let g_selectedSize = 10.0;
 let g_selectedType = POINT;
 let g_selectedSegments = 10;
 
+let g_previewShape
 function addHTMLActions(){
     //adds functionality for the color picker
     document.getElementById("colorPicker").addEventListener('input', setColor);
@@ -89,10 +90,22 @@ function addHTMLActions(){
     document.getElementById("segmentSlide").addEventListener('mouseup', function() {g_selectedSegments = this.value;});
 
     document.getElementById("clearBtn").addEventListener('click', function() {g_shapesList = []; renderAllShapes(); gl.clearColor(0.0, 0.0, 0.0, 1.0); gl.clear(gl.COLOR_BUFFER_BIT);});
-    document.getElementById("pointBtn").addEventListener('click', function() {g_selectedType = POINT});
-    document.getElementById("triBtn").addEventListener('click', function() {g_selectedType = TRIANGLE});
-    document.getElementById("circBtn").addEventListener('click', function() {g_selectedType = CIRCLE});
+    document.getElementById("pointBtn").addEventListener('click', function() {g_selectedType = POINT; g_previewShape = new Point(); g_previewShape.position = null;});
+    document.getElementById("triBtn").addEventListener('click', function() {g_selectedType = TRIANGLE; g_previewShape = new Triangle(); g_previewShape.position = null;});
+    document.getElementById("circBtn").addEventListener('click', function() {g_selectedType = CIRCLE; g_previewShape = new Circle(); g_previewShape.position = null;});
     document.getElementById("drawPicBtn").addEventListener('click', drawMyPicture);
+
+    //handles shape preview 
+    canvas.addEventListener('mousemove', (ev) => {
+        if (!g_previewShape) return;
+
+        var [x, y] = convertCoordinatesEventToGL(ev);
+        g_previewShape.position = [x, y];
+        g_previewShape.color = g_selectedColor.slice();
+        g_previewShape.size = g_selectedSize;
+
+        renderAllShapes();
+    });
 }
 
 function setColor(ev){
@@ -124,21 +137,16 @@ function click(ev){
     
     [x, y] = convertCoordinatesEventToGL(ev);
 
-    let shape;
-    if(g_selectedType == POINT){
-        shape = new Point();
-    }
-    else if(g_selectedType == TRIANGLE){
-        shape = new Triangle();
-    }
-    else{
-        shape = new Circle();
-    }
-
-    shape.position = [x,y];
-    shape.color = g_selectedColor.slice();
-    shape.size = g_selectedSize;
+    if (!g_previewShape) return;
+    let shape = g_previewShape;
+    shape.position = [x, y];
     g_shapesList.push(shape);
+
+    if (g_selectedType === POINT) g_previewShape = new Point();
+    else if (g_selectedType === TRIANGLE) g_previewShape = new Triangle();
+    else if (g_selectedType === CIRCLE) g_previewShape = new Circle();
+
+    g_previewShape.position = null;
 
     renderAllShapes();
 }
@@ -155,12 +163,15 @@ function convertCoordinatesEventToGL(ev){
 }
 
 function renderAllShapes(){
-
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var len = g_shapesList.length;
     for(var i = 0; i < len; i++){
         g_shapesList[i].render();
+    }
+
+    if (g_previewShape && g_previewShape.position) {
+        g_previewShape.render();
     }
 }
 
