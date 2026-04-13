@@ -13,13 +13,17 @@
     <script src="asgn1.js"></script>
 </head>
 <body onload="main()">
+    <div>
     <div style="position: absolute; left:475px;">
         <div>Jesse Easley</div>
         <div>jeeasley@ucsc.edu</div>
+        <input type="button" id="drawPicBtn" value="Draw my picture!" style="margin-top: 10px">
+        <p><img src="penguin.png" width="200px" height="200px"></p>
     </div>
     
-    <canvas id="webgl" width="400px" height="400px" style="display: block; margin-bottom: 5px">Canvas not loaded!</canvas>
-
+    <canvas id="webgl" width="400px" height="400px" style="display: block; margin-bottom: 5px; border: 2px solid black; border-radius: 2px;">Canvas not loaded!</canvas>
+    </div>
+    
     <div>
         Color: <input type="color" id="colorPicker" value="#ff0000">
         Clear: <input type="button" id="clearBtn" value="Clear">

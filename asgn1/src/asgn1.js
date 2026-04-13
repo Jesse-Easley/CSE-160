@@ -59,6 +59,16 @@ function connectVariablesToGLSL(){
     }
 }
 
+let vertexBuffer;
+function initBuffer(){
+//create a buffer object
+  vertexBuffer = gl.createBuffer();
+  if (!vertexBuffer) {
+    console.log('Failed to create the buffer object');
+    return -1;
+  }
+}
+
 //Constants
 const POINT = 0;
 const TRIANGLE = 1;
@@ -78,11 +88,11 @@ function addHTMLActions(){
     document.getElementById("sizeSlide").addEventListener('mouseup', function() {g_selectedSize = this.value;});
     document.getElementById("segmentSlide").addEventListener('mouseup', function() {g_selectedSegments = this.value;});
 
-
-    document.getElementById("clearBtn").addEventListener('click', function() {g_shapesList = []; renderAllShapes();});
+    document.getElementById("clearBtn").addEventListener('click', function() {g_shapesList = []; renderAllShapes(); gl.clearColor(0.0, 0.0, 0.0, 1.0); gl.clear(gl.COLOR_BUFFER_BIT);});
     document.getElementById("pointBtn").addEventListener('click', function() {g_selectedType = POINT});
     document.getElementById("triBtn").addEventListener('click', function() {g_selectedType = TRIANGLE});
     document.getElementById("circBtn").addEventListener('click', function() {g_selectedType = CIRCLE});
+    document.getElementById("drawPicBtn").addEventListener('click', drawMyPicture);
 }
 
 function setColor(ev){
@@ -97,11 +107,12 @@ function setColor(ev){
 function main() {
     setupWebGL();
     connectVariablesToGLSL();
+    initBuffer();
 
     addHTMLActions()
 
     canvas.onmousedown = click;
-    canvas.onmousemove = function(ev) { if(ev.buttons == 1){click(ev)};};
+    canvas.onmousemove = function(ev) {if(ev.buttons == 1){click(ev)};};
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -109,6 +120,8 @@ function main() {
 
 var g_shapesList = [];
 function click(ev){
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    
     [x, y] = convertCoordinatesEventToGL(ev);
 
     let shape;
@@ -149,4 +162,123 @@ function renderAllShapes(){
     for(var i = 0; i < len; i++){
         g_shapesList[i].render();
     }
+}
+
+function drawMyPicture() {
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    //beak (orange)
+    gl.uniform4f(u_FragColor, 1.0, 0.5, 0.0, 1.0);
+    drawTriangle([
+        ...grid(9,8.5), ...grid(7,9.5), ...grid(7,7.5)
+    ]);
+
+    //feet (orange)
+    drawTriangle([
+        ...grid(5,0), ...grid(4,1), ...grid(3,0)
+    ]);
+    drawTriangle([
+        ...grid(3.5,0.5), ...grid(4,1), ...grid(3.5,1)
+    ]);
+    drawTriangle([
+        ...grid(4.5,0.5), ...grid(4.5,1), ...grid(4,1)
+    ]);
+    drawTriangle([
+        ...grid(7,0), ...grid(6,1), ...grid(5,0)
+    ]);
+    drawTriangle([
+        ...grid(5.5,0.5), ...grid(6,1), ...grid(5.5,1)
+    ]);
+    drawTriangle([
+        ...grid(6.5,0.5), ...grid(6.5,1), ...grid(6,1)
+    ]);
+
+    //body base (black)
+    gl.uniform4f(u_FragColor, 0.0, 0.0, 0.0, 1.0);
+    drawTriangle([
+        ...grid(2,1), ...grid(8,1), ...grid(8,7)
+    ]);
+    drawTriangle([
+        ...grid(8,7), ...grid(2,7), ...grid(2,1)
+    ]);
+
+    //head (black)
+    gl.uniform4f(u_FragColor, 0.0, 0.0, 0.0, 1.0);
+    drawTriangle([
+        ...grid(7,7), ...grid(7,10), ...grid(3,7)
+    ]);
+    drawTriangle([
+        ...grid(7,10), ...grid(3,10), ...grid(3,7)
+    ]);
+
+    //left wing (black)
+    drawTriangle([
+        ...grid(3,7), ...grid(2,7), ...grid(0,4)
+    ]);
+    drawTriangle([
+        ...grid(2,7), ...grid(0,5), ...grid(0,4)
+    ]);
+
+    //right wing (black)
+    drawTriangle([
+        ...grid(8,7), ...grid(7,7), ...grid(10,4)
+    ]);
+    drawTriangle([
+        ...grid(10,5), ...grid(8,7), ...grid(10,4)
+    ]);
+
+    //belly (white)
+    gl.uniform4f(u_FragColor, 1.0, 1.0, 1.0, 1.0);
+    drawTriangle([
+        ...grid(3,2), ...grid(7,2), ...grid(7,6)
+    ]);
+    drawTriangle([
+        ...grid(7,6), ...grid(3,6), ...grid(3,2)
+    ]);
+
+    //corner cuts (white)
+    drawTriangle([
+        ...grid(4,10), ...grid(3,10), ...grid(3,9)
+    ]);
+    drawTriangle([
+        ...grid(4,7), ...grid(3,8), ...grid(3,7)
+    ]);
+    drawTriangle([
+        ...grid(3,1), ...grid(2,2), ...grid(2,1)
+    ]);
+    drawTriangle([
+        ...grid(7,1), ...grid(8,1), ...grid(8,2)
+    ]);
+    drawTriangle([
+        ...grid(7,9.5), ...grid(7,10), ...grid(6,10)
+    ]);
+    drawTriangle([
+        ...grid(7,7), ...grid(7,7.5), ...grid(6,7)
+    ]);
+
+    //eye (white)
+    drawTriangle([
+        ...grid(6,9), ...grid(5,9), ...grid(5,8)
+    ]);
+
+    //corner cuts (black)
+    gl.uniform4f(u_FragColor, 0.0, 0.0, 0.0, 1.0);
+    drawTriangle([
+        ...grid(3,5), ...grid(4,6), ...grid(3,6)
+    ]);
+    drawTriangle([
+        ...grid(3,2), ...grid(4,2), ...grid(3,3)
+    ]);
+    drawTriangle([
+        ...grid(6,2), ...grid(7,2), ...grid(7,3)
+    ]);
+    drawTriangle([
+        ...grid(7,5), ...grid(7,6), ...grid(6,6)
+    ]);
+}
+
+//used to convert from my paper drawing grid to webgl grid
+function grid(x, y) {
+    return [(x - 5) / 5, (y - 5) / 5];
 }
