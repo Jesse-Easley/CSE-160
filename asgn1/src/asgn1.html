@@ -7,6 +7,9 @@
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>
     <script src="../lib/cuon-utils.js"></script>
+    <script src="Points.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="Circle.js"></script>
     <script src="asgn1.js"></script>
 </head>
 <body onload="main()">
@@ -16,6 +19,22 @@
     </div>
     
     <canvas id="webgl" width="400px" height="400px" style="display: block; margin-bottom: 5px">Canvas not loaded!</canvas>
+
+    <div>
+        Color: <input type="color" id="colorPicker" value="#ff0000">
+        Clear: <input type="button" id="clearBtn" value="Clear">
+    </div>
+    <div>
+        <input type="button" id="pointBtn" value="Point">
+        <input type="button" id="triBtn" value="Triangle">
+        <input type="button" id="circBtn" value="Circle">
+    </div>
+    <div>
+        Size: <input type="range" min="5" max="40" value="10" id="sizeSlide">
+    </div>
+    <div>
+        Circle Segments: <input type="range" min="10" max="40" value="10" id="segmentSlide">
+    </div>
 
 </body>
 </html>
