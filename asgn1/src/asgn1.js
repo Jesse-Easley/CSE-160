@@ -59,11 +59,11 @@ function connectVariablesToGLSL(){
     }
 }
 
-let vertexBuffer;
+let g_vertexBuffer;
 function initBuffer(){
 //create a buffer object
-  vertexBuffer = gl.createBuffer();
-  if (!vertexBuffer) {
+  g_vertexBuffer = gl.createBuffer();
+  if (!g_vertexBuffer) {
     console.log('Failed to create the buffer object');
     return -1;
   }
@@ -142,6 +142,7 @@ function click(ev){
     shape.position = [x, y];
     g_shapesList.push(shape);
 
+    //create new previews
     if (g_selectedType === POINT) g_previewShape = new Point();
     else if (g_selectedType === TRIANGLE) g_previewShape = new Triangle();
     else if (g_selectedType === CIRCLE) g_previewShape = new Circle();
@@ -170,6 +171,7 @@ function renderAllShapes(){
         g_shapesList[i].render();
     }
 
+    //draw preview last
     if (g_previewShape && g_previewShape.position) {
         g_previewShape.render();
     }
