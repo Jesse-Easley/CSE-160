@@ -26,6 +26,7 @@ function addHTMLActions(scene){
 
     document.getElementById("beakSlider").addEventListener("input", function(){
         gBeakAngle = Number(this.value);
+        console.log(gBeakAngle);
         scene.renderScene();
     });
 }

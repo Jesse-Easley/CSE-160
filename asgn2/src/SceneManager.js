@@ -12,6 +12,8 @@ class SceneManager{
         const render = this.renderer;
         render.clear();
 
+        this.penguinTransforms();
+
         //update the transformation matrices of all scene objects
         this.root.updateWorldMatrix(null);
 
@@ -30,54 +32,79 @@ class SceneManager{
         }
     }
 
+    /**
+     * @description Creates and connects SceneObjects for penguin model
+     */
     makePenguin(){
-        //create penguin body and attach to scene root
-        let body = new SceneObject();
-        this.root.addChild(body);
+        this.body = new SceneObject();
+        this.belly = new SceneObject();
+        this.neck = new SceneObject();
+        this.head = new SceneObject();
+        this.upperBeak = new SceneObject();
+        this.upperBeakEnd = new SceneObject();
+        this.lowerBeak = new SceneObject();
+        this.lowerBeakEnd = new SceneObject();
 
-        body.color = [0.15, 0.15, 0.15, 1.0];
+        this.root.addChild(this.body);
+        this.body.addChild(this.belly);
+        this.body.addChild(this.neck);
+        this.neck.addChild(this.head);
+        this.head.addChild(this.upperBeak);
+        this.upperBeak.addChild(this.upperBeakEnd);
+        this.head.addChild(this.lowerBeak);
+        this.lowerBeak.addChild(this.lowerBeakEnd);
 
-        body.translate(0, -.3, 0);
-        body.scale(.5, .5, .5);
-        body.rotate(-45, 1, 0, 0)
+        this.body.color = [0.15, 0.15, 0.15, 1.0];
+        this.neck.color = [0.15, 0.15, 0.15, 1.0];
+        this.head.color = [0.15, 0.15, 0.15, 1.0];
+        this.upperBeak.color = [1.0, 0.5, 0.0, 1.0];
+        this.upperBeakEnd.color = [1.0, 0.5, 0.0, 1.0];
+        this.lowerBeak.color = [1.0, 0.5, 0.0, 1.0];
+        this.lowerBeakEnd.color = [1.0, 0.5, 0.0, 1.0];
 
-        //add belly
-        let belly = new SceneObject();
-        body.addChild(belly);
+    }
 
-        belly.translate(0,0,-0.3);
-        belly.scale(0.8, 0.8, 0.5);
-        
-        //add neck to body
-        let neck = new SceneObject();
-        body.addChild(neck);
+    /**
+     * @description Creates transformatin matrices for the various parts of the penguin
+     */
+    penguinTransforms(){
+        this.body.localMatrix.setIdentity();
+        this.belly.localMatrix.setIdentity();
+        this.neck.localMatrix.setIdentity();
+        this.head.localMatrix.setIdentity();
+        this.upperBeak.localMatrix.setIdentity();
+        this.upperBeakEnd.localMatrix.setIdentity();
+        this.lowerBeak.localMatrix.setIdentity();
+        this.lowerBeakEnd.localMatrix.setIdentity();
 
-        neck.color = [0.15, 0.15, 0.15, 1.0];
+        this.body.translate(0, -.3, 0);
+        this.body.scale(.4, .5, .4);
+        this.body.rotate(0, 1, 0, 0)
 
-        //make neck transforms
-        //neck.rotate(10,1,0,0);
-        neck.translate(0, 0.6, 0);
-        neck.scale(0.8, 0.4, 0.8);
+        this.belly.translate(0, 0, -0.3);
+        this.belly.scale(0.8, 0.8, 0.5);
 
-        //add head to neck
-        let head = new SceneObject();
-        neck.addChild(head);
+        this.neck.translate(0, 0.6, 0);
+        this.neck.scale(0.8, 0.4, 0.8);
 
-        head.color = [0.15, 0.15, 0.15, 1.0];
+        this.head.translate(0, 1, 0);
+        this.head.scale(.8, 1.5, .8);
 
-        head.translate(0, 1, 0);
-        head.scale(.8, 1.5, .8);
+        this.upperBeak.translate(0.0, 0.2, -0.1)
+        this.upperBeak.rotate(gBeakAngle, 1, 0, 0)
+        this.upperBeak.translate(0.0, 0.0, -.4);
+        this.upperBeak.scale(0.3, 0.3, 0.9);
 
-        //add upper
-        let upperBeak = new SceneObject();
-        head.addChild(upperBeak);
+        this.upperBeakEnd.translate(0.0, -0.1, -0.5)
+        this.upperBeakEnd.scale(0.75, 0.8, 0.4);
 
-        upperBeak.color = [1.0, 0.5, 0.0, 1.0];
-        
-        upperBeak.translate(0, 0.3, -.5)
-        upperBeak.rotate(gBeakAngle, 1, 0, 0)
-        upperBeak.scale(.5, .2, 0.8);
-        //upperBeak.translate(0, 0, -1);
+        this.lowerBeak.translate(0.0, 0.0, -0.1)
+        this.lowerBeak.rotate(-gBeakAngle, 1, 0, 0)
+        this.lowerBeak.translate(0.0, 0.0, -.4);
+        this.lowerBeak.scale(0.3, 0.1, 0.9);
+
+        this.lowerBeakEnd.translate(0.0, 0.1, -0.5);
+        this.lowerBeakEnd.scale(0.75, 0.8, 0.4);
 
     }
 }

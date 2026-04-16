@@ -12,15 +12,15 @@ class SceneObject{
     }
 
     rotate(angle, x, y, z){
-        this.localMatrix.rotate(angle,x,y,z);
+        this.localMatrix.rotate(angle, x, y, z);
     }
 
     translate(x, y, z){
-        this.localMatrix.translate(x,y,z);
+        this.localMatrix.translate(x, y, z);
     }
 
-    scale(x,y,z){
-        this.localMatrix.scale(x,y,z);
+    scale(x, y, z){
+        this.localMatrix.scale(x, y, z);
     }
 
     updateWorldMatrix(parentWorldMatrix){
