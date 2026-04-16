@@ -136,8 +136,6 @@ class Renderer{
     drawCube(M, color){
         const gl = this.gl;
 
-        
-
         //create and bind buffer
         this.cubeBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeBuffer);
@@ -151,7 +149,8 @@ class Renderer{
 
         //create global rotation matrix
         const globalRot = new Matrix4();
-        globalRot.setRotate(gAnimalGlobalRotation, 0, 1, 0);
+        globalRot.setRotate(-gViewingAngle, 1, 0, 0);
+        globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
 
         //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)

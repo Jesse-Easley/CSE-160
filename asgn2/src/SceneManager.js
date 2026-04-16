@@ -79,7 +79,7 @@ class SceneManager{
 
         this.body.translate(0, -.3, 0);
         this.body.scale(.4, .5, .4);
-        this.body.rotate(0, 1, 0, 0)
+        this.body.rotate(0, 1, 0, 0);
 
         this.belly.translate(0, 0, -0.3);
         this.belly.scale(0.8, 0.8, 0.5);
@@ -90,17 +90,17 @@ class SceneManager{
         this.head.translate(0, 1, 0);
         this.head.scale(.8, 1.5, .8);
 
-        this.upperBeak.translate(0.0, 0.2, -0.1)
-        this.upperBeak.rotate(gBeakAngle, 1, 0, 0)
-        this.upperBeak.translate(0.0, 0.0, -.4);
+        this.upperBeak.translate(0.0, 0.2, -0.1); //move to hinge point
+        this.upperBeak.rotate(gBeakAngle, 1, 0, 0); //angle around hinge
+        this.upperBeak.translate(0.0, 0.0, -.4); //move to final position
         this.upperBeak.scale(0.3, 0.3, 0.9);
 
         this.upperBeakEnd.translate(0.0, -0.1, -0.5)
         this.upperBeakEnd.scale(0.75, 0.8, 0.4);
 
-        this.lowerBeak.translate(0.0, 0.0, -0.1)
-        this.lowerBeak.rotate(-gBeakAngle, 1, 0, 0)
-        this.lowerBeak.translate(0.0, 0.0, -.4);
+        this.lowerBeak.translate(0.0, 0.0, -0.1); //move to hinge point
+        this.lowerBeak.rotate(-gBeakAngle, 1, 0, 0); //angle around hinge
+        this.lowerBeak.translate(0.0, 0.0, -.4); //move to final position
         this.lowerBeak.scale(0.3, 0.1, 0.9);
 
         this.lowerBeakEnd.translate(0.0, 0.1, -0.5);

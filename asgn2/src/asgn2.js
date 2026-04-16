@@ -2,7 +2,8 @@
 let canvas;
 let gl;
 
-let gAnimalGlobalRotation = 0;
+let gAnimalGlobalRotation = 45;
+let gViewingAngle = 15;
 let gBeakAngle = 0;
 
 //sets up webgl contex
@@ -24,6 +25,11 @@ function addHTMLActions(scene){
         scene.renderScene();
     });
 
+    document.getElementById("viewAngleSlider").addEventListener("input", function(){
+        gViewingAngle = Number(this.value);
+        scene.renderScene();
+    });
+
     document.getElementById("beakSlider").addEventListener("input", function(){
         gBeakAngle = Number(this.value);
         console.log(gBeakAngle);
@@ -42,10 +48,9 @@ function main(){
     const scene = new SceneManager();
     scene.setRenderer(render);
 
+    //create penguin geometry and render the scene
     scene.makePenguin();
-
     scene.renderScene();
-
 
     //hookup html inputs
     addHTMLActions(scene);
