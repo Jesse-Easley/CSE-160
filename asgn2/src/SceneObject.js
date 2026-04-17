@@ -7,8 +7,6 @@ class SceneObject{
 
         this.parent = null;
         this.children = [];
-
-        return;
     }
 
     rotate(angle, x, y, z){

@@ -6,6 +6,9 @@ let gAnimalGlobalRotation = 45;
 let gViewingAngle = 15;
 let gBeakAngle = 0;
 
+let g_time = 0;
+let gAnimate = true;
+
 //sets up webgl contex
 function setupWebGL(){
     //get canvas element
@@ -22,18 +25,21 @@ function setupWebGL(){
 function addHTMLActions(scene){
     document.getElementById("rotationSlider").addEventListener("input", function(){
         gAnimalGlobalRotation = Number(this.value);
-        scene.renderScene();
+        //scene.renderScene();
     });
 
     document.getElementById("viewAngleSlider").addEventListener("input", function(){
         gViewingAngle = Number(this.value);
-        scene.renderScene();
+        //scene.renderScene();
     });
 
     document.getElementById("beakSlider").addEventListener("input", function(){
         gBeakAngle = Number(this.value);
-        console.log(gBeakAngle);
         scene.renderScene();
+    });
+
+    document.getElementById("animToggle").addEventListener("change", function() {
+        gAnimate = this.checked;
     });
 }
 
@@ -49,12 +55,18 @@ function main(){
     scene.setRenderer(render);
 
     //create penguin geometry and render the scene
-    scene.makePenguin();
     scene.renderScene();
 
     //hookup html inputs
     addHTMLActions(scene);
 
-    //animation loop
-
+    // start animation loop
+    function tick() {
+        if (gAnimate) {
+            g_time = performance.now();
+        }
+        scene.renderScene();
+        requestAnimationFrame(tick);
+    }
+    tick();
 }

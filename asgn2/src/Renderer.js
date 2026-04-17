@@ -13,7 +13,6 @@ var FSHADER_SOURCE =
         gl_FragColor = u_FragColor;
      }`;
 
-
 class Renderer{
     constructor(gl){
         this.gl = gl;
@@ -149,7 +148,7 @@ class Renderer{
 
         //create global rotation matrix
         const globalRot = new Matrix4();
-        globalRot.setRotate(-gViewingAngle, 1, 0, 0);
+        globalRot.rotate(-gViewingAngle, 1, 0, 0);
         globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
 
         //assign data to appropriate variables
