@@ -20,63 +20,7 @@ class Renderer{
         initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
         this.initGLState();
         this.initShaderVariables();
-
-        //base cube which we will transform
-        this.cubeVertices = new Float32Array([
-            //front face
-            -0.5, -0.5,  0.5,
-            0.5, -0.5,  0.5,
-            0.5,  0.5,  0.5,
-
-            -0.5, -0.5,  0.5,
-            0.5,  0.5,  0.5,
-            -0.5,  0.5,  0.5,
-
-            //back face
-            -0.5, -0.5, -0.5,
-            -0.5,  0.5, -0.5,
-            0.5,  0.5, -0.5,
-
-            -0.5, -0.5, -0.5,
-            0.5,  0.5, -0.5,
-            0.5, -0.5, -0.5,
-
-            //left face
-            -0.5, -0.5, -0.5,
-            -0.5, -0.5,  0.5,
-            -0.5,  0.5,  0.5,
-
-            -0.5, -0.5, -0.5,
-            -0.5,  0.5,  0.5,
-            -0.5,  0.5, -0.5,
-
-            //right face
-            0.5, -0.5, -0.5,
-            0.5,  0.5, -0.5,
-            0.5,  0.5,  0.5,
-
-            0.5, -0.5, -0.5,
-            0.5,  0.5,  0.5,
-            0.5, -0.5,  0.5,
-
-            //top face
-            -0.5,  0.5, -0.5,
-            -0.5,  0.5,  0.5,
-            0.5,  0.5,  0.5,
-
-            -0.5,  0.5, -0.5,
-            0.5,  0.5,  0.5,
-            0.5,  0.5, -0.5,
-
-            //bottom face
-            -0.5, -0.5, -0.5,
-            0.5, -0.5, -0.5,
-            0.5, -0.5,  0.5,
-
-            -0.5, -0.5, -0.5,
-            0.5, -0.5,  0.5,
-            -0.5, -0.5,  0.5,
-        ]);
+        this.initBuffers();
     }
 
     initGLState(){
@@ -118,29 +62,80 @@ class Renderer{
         }
     }
 
-    // initBuffers(){
-    //     const gl = this.gl;
+    initBuffers(){
+        const gl = this.gl;
 
-    //     //create buffer and fill with base cube
-    //     this.cubeBuffer = gl.createBuffer();
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeBuffer);
-    //     gl.bufferData(gl.ARRAY_BUFFER, this.cubeVertices, gl.STATIC_DRAW);
-    // }
+        //create buffer
+        this.buffer = gl.createBuffer();
+    }
 
     clear(){
         const gl = this.gl;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
-    drawCube(M, color){
+    // drawCube(M, color){
+    //     const gl = this.gl;
+
+    //     //create and bind buffer
+    //     this.cubeBuffer = gl.createBuffer();
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeBuffer);
+
+    //     //send base cube to ARRAY_BUFFER
+    //     gl.bufferData(gl.ARRAY_BUFFER, this.cubeVertices, gl.STATIC_DRAW);
+
+    //     //assign buffer object to a_Position and enable assignment
+    //     gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
+    //     gl.enableVertexAttribArray(this.a_Position);
+
+    //     //create global rotation matrix
+    //     const globalRot = new Matrix4();
+    //     globalRot.rotate(-gViewingAngle, 1, 0, 0);
+    //     globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
+
+    //     //assign data to appropriate variables
+    //     gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)
+    //     gl.uniformMatrix4fv(this.u_ModelMatrix, false, M.elements);
+    //     gl.uniform4fv(this.u_FragColor, color);
+
+    //     gl.drawArrays(gl.TRIANGLES, 0, this.cubeVertices.length / 3);
+    // }
+
+    // drawCylinder(M, color){
+    //     const gl = this.gl;
+
+    //     //create and bind buffer
+    //     this.cylBuffer = gl.createBuffer();
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.cylBuffer);
+
+    //     //send base cube to ARRAY_BUFFER
+    //     gl.bufferData(gl.ARRAY_BUFFER, this.cylinderVertices, gl.STATIC_DRAW);
+
+    //     //assign buffer object to a_Position and enable assignment
+    //     gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
+    //     gl.enableVertexAttribArray(this.a_Position);
+
+    //     //create global rotation matrix
+    //     const globalRot = new Matrix4();
+    //     globalRot.rotate(-gViewingAngle, 1, 0, 0);
+    //     globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
+
+    //     //assign data to appropriate variables
+    //     gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)
+    //     gl.uniformMatrix4fv(this.u_ModelMatrix, false, M.elements);
+    //     gl.uniform4fv(this.u_FragColor, color);
+
+    //     gl.drawArrays(gl.TRIANGLES, 0, this.cylinderVertices.length / 3);
+    // }
+
+    drawMesh(object){
         const gl = this.gl;
 
         //create and bind buffer
-        this.cubeBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
-        //send base cube to ARRAY_BUFFER
-        gl.bufferData(gl.ARRAY_BUFFER, this.cubeVertices, gl.STATIC_DRAW);
+        //send object mesh to ARRAY_BUFFER
+        gl.bufferData(gl.ARRAY_BUFFER, object.mesh, gl.STATIC_DRAW);
 
         //assign buffer object to a_Position and enable assignment
         gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
@@ -153,9 +148,9 @@ class Renderer{
 
         //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)
-        gl.uniformMatrix4fv(this.u_ModelMatrix, false, M.elements);
-        gl.uniform4fv(this.u_FragColor, color);
+        gl.uniformMatrix4fv(this.u_ModelMatrix, false, object.worldMatrix.elements);
+        gl.uniform4fv(this.u_FragColor, object.color);
 
-        gl.drawArrays(gl.TRIANGLES, 0, 36);
+        gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 3);
     }
 }

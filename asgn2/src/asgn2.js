@@ -64,9 +64,15 @@ function main(){
     function tick() {
         if (gAnimate) {
             g_time = performance.now();
+            updateAnimationAngles();
         }
         scene.renderScene();
         requestAnimationFrame(tick);
     }
     tick();
+}
+
+function updateAnimationAngles(){
+    gBeakAngle = (Math.sin(g_time * 0.008) + 1) * 2;
+    document.getElementById("beakSlider").value = gBeakAngle;
 }

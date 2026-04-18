@@ -24,8 +24,9 @@ class SceneManager{
     }
 
     traverseSceneGraph(object){
-        if(object != this.root){
-            this.renderer.drawCube(object.worldMatrix, object.color);
+        //if not an empty SceneObject, draw it
+        if(object.mesh){
+            this.renderer.drawMesh(object);
         }
 
         for(let child of object.children){
@@ -37,31 +38,25 @@ class SceneManager{
      * @description Creates and connects SceneObjects for penguin model
      */
     makePenguin(){
-        this.body = new SceneObject();
-        this.belly = new SceneObject();
-        this.neck = new SceneObject();
-        this.head = new SceneObject();
-        this.upperBeak = new SceneObject();
-        this.upperBeakEnd = new SceneObject();
-        this.lowerBeak = new SceneObject();
-        this.lowerBeakEnd = new SceneObject();
+        this.body = new Cube();
+        this.belly = new Cylinder();
+        this.neck = new Cube();
+        this.head = new Cube();
+        this.upperBeak = new Cylinder();
+        this.lowerBeak = new Cylinder();
 
         this.root.addChild(this.body);
         this.body.addChild(this.belly);
         this.body.addChild(this.neck);
         this.neck.addChild(this.head);
         this.head.addChild(this.upperBeak);
-        this.upperBeak.addChild(this.upperBeakEnd);
         this.head.addChild(this.lowerBeak);
-        this.lowerBeak.addChild(this.lowerBeakEnd);
 
         this.body.color = [0.15, 0.15, 0.15, 1.0];
         this.neck.color = [0.15, 0.15, 0.15, 1.0];
         this.head.color = [0.15, 0.15, 0.15, 1.0];
         this.upperBeak.color = [1.0, 0.5, 0.0, 1.0];
-        this.upperBeakEnd.color = [1.0, 0.5, 0.0, 1.0];
         this.lowerBeak.color = [1.0, 0.5, 0.0, 1.0];
-        this.lowerBeakEnd.color = [1.0, 0.5, 0.0, 1.0];
 
     }
 
@@ -74,16 +69,14 @@ class SceneManager{
         this.neck.localMatrix.setIdentity();
         this.head.localMatrix.setIdentity();
         this.upperBeak.localMatrix.setIdentity();
-        this.upperBeakEnd.localMatrix.setIdentity();
         this.lowerBeak.localMatrix.setIdentity();
-        this.lowerBeakEnd.localMatrix.setIdentity();
 
         this.body.translate(0, -.3, 0);
         this.body.scale(.4, .5, .4);
         this.body.rotate(0, 1, 0, 0); 
 
-        this.belly.translate(0, 0, -0.3);
-        this.belly.scale(0.8, 0.8, 0.5);
+        this.belly.translate(0, 0, -0.22);
+        this.belly.scale(0.5, 0.8, 0.4);
 
         this.neck.translate(0, 0.6, 0);
         this.neck.scale(0.8, 0.4, 0.8);
@@ -92,20 +85,14 @@ class SceneManager{
         this.head.scale(.8, 1.5, .8);
 
         this.upperBeak.translate(0.0, 0.2, -0.1); //move to hinge point
-        this.upperBeak.rotate(((Math.sin(g_time * 0.008) + 1) * 2 + gBeakAngle), 1, 0, 0);
+        this.upperBeak.rotate(gBeakAngle, 1, 0, 0);
         this.upperBeak.translate(0.0, 0.0, -.4); //move to final position
         this.upperBeak.scale(0.3, 0.3, 0.9);
 
-        this.upperBeakEnd.translate(0.0, -0.1, -0.5)
-        this.upperBeakEnd.scale(0.75, 0.8, 0.4);
-
         this.lowerBeak.translate(0.0, 0.0, -0.1); //move to hinge point
-        this.lowerBeak.rotate(-((Math.sin(g_time * 0.008) + 1) * 2 + gBeakAngle), 1, 0, 0);
+        this.lowerBeak.rotate(-gBeakAngle, 1, 0, 0);
         this.lowerBeak.translate(0.0, 0.0, -.4); //move to final position
         this.lowerBeak.scale(0.3, 0.1, 0.9);
-
-        this.lowerBeakEnd.translate(0.0, 0.1, -0.5);
-        this.lowerBeakEnd.scale(0.75, 0.8, 0.4);
 
     }
 }
