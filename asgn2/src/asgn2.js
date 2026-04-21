@@ -2,12 +2,13 @@
 let canvas;
 let gl;
 
-let gAnimalGlobalRotation = 45;
-let gViewingAngle = 15;
+let gAnimalGlobalRotation = 0;
+let gViewingAngle = 0;
 let gBeakAngle = 0;
+let gWingAngle = 0;
 
 let g_time = 0;
-let gAnimate = true;
+let gAnimate = false;
 
 //sets up webgl contex
 function setupWebGL(){
@@ -35,6 +36,11 @@ function addHTMLActions(scene){
 
     document.getElementById("beakSlider").addEventListener("input", function(){
         gBeakAngle = Number(this.value);
+        scene.renderScene();
+    });
+
+    document.getElementById("wingSlider").addEventListener("input", function(){
+        gWingAngle = Number(this.value);
         scene.renderScene();
     });
 
@@ -75,4 +81,14 @@ function main(){
 function updateAnimationAngles(){
     gBeakAngle = (Math.sin(g_time * 0.008) + 1) * 2;
     document.getElementById("beakSlider").value = gBeakAngle;
+}
+
+function sendTextToHTML(text, htmlID){
+    var htmlElem = document.getElementById(htmlID);
+    if(!htmlElem){
+        console.log("Failed to get " + elemID + " from HTML!");
+        return;
+    }
+
+    htmlElem.innerHTML = text;
 }

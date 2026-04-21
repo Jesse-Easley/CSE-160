@@ -19,13 +19,17 @@
     <script src="asgn2.js"></script>
 </head>
 <body onload="main()">
-    <div>
-        <div style="position: absolute; left:475px;">
+    <div style="display: flex; gap: 20px"> 
+        <canvas id="webgl" width="400px" height="400px" style="display: block;">Canvas not loaded!</canvas>
+    
+        <div>
             <div>Jesse Easley</div>
             <div>jeeasley@ucsc.edu</div>
         </div>
-        
-        <canvas id="webgl" width="400px" height="400px" style="display: block;">Canvas not loaded!</canvas>
+    </div>
+
+    <div>
+        <span id="fps"></span>
     </div>
     
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -39,6 +43,11 @@
     <div style="display: flex; align-items: center; gap: 10px;">
         <label for="beakSlider">Open Beak: </label>
         <input type="range" id="beakSlider" min="0" max="18" value="0">
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="wingSlider">Wings: </label>
+        <input type="range" id="wingSlider" min="-45" max="45" value="0">
     </div>
 
     <div style="display: flex; align-items: center; gap: 10px;">

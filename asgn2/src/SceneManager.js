@@ -11,6 +11,8 @@ class SceneManager{
     }
 
     renderScene(){
+        var startTime = performance.now();
+
         const render = this.renderer;
         render.clear();
 
@@ -21,6 +23,9 @@ class SceneManager{
 
         //start traversal for rendering
         this.traverseSceneGraph(this.root);
+
+        var duration = performance.now() - startTime;
+        sendTextToHTML("ms: " + Math.floor(duration) + ", fps: " + Math.floor(10000/duration), "fps");
     }
 
     traverseSceneGraph(object){
@@ -44,10 +49,18 @@ class SceneManager{
         this.head = new Cube();
         this.upperBeak = new Cylinder();
         this.lowerBeak = new Cylinder();
+        this.leftWingJoint = new SceneObject(); //empty to act as joint
+        this.leftWing = new Cylinder();
+        this.rightWingJoint = new SceneObject(); //empty to act as joint
+        this.rightWing = new Cylinder();
 
         this.root.addChild(this.body);
         this.body.addChild(this.belly);
         this.body.addChild(this.neck);
+        this.body.addChild(this.leftWingJoint);
+        this.body.addChild(this.rightWingJoint);
+        this.leftWingJoint.addChild(this.leftWing);
+        this.rightWingJoint.addChild(this.rightWing);
         this.neck.addChild(this.head);
         this.head.addChild(this.upperBeak);
         this.head.addChild(this.lowerBeak);
@@ -57,6 +70,8 @@ class SceneManager{
         this.head.color = [0.15, 0.15, 0.15, 1.0];
         this.upperBeak.color = [1.0, 0.5, 0.0, 1.0];
         this.lowerBeak.color = [1.0, 0.5, 0.0, 1.0];
+        this.leftWing.color = [1, 0.15, 0.15, 1.0];
+        this.rightWing.color = [1, 0.15, 0.15, 1.0];
 
     }
 
@@ -70,6 +85,10 @@ class SceneManager{
         this.head.localMatrix.setIdentity();
         this.upperBeak.localMatrix.setIdentity();
         this.lowerBeak.localMatrix.setIdentity();
+        this.leftWingJoint.localMatrix.setIdentity();
+        this.leftWing.localMatrix.setIdentity();
+        this.rightWingJoint.localMatrix.setIdentity();
+        this.rightWing.localMatrix.setIdentity();
 
         this.body.translate(0, -.3, 0);
         this.body.scale(.4, .5, .4);
@@ -84,6 +103,7 @@ class SceneManager{
         this.head.translate(0, 1, 0);
         this.head.scale(.8, 1.5, .8);
 
+        //beaks
         this.upperBeak.translate(0.0, 0.2, -0.1); //move to hinge point
         this.upperBeak.rotate(gBeakAngle, 1, 0, 0);
         this.upperBeak.translate(0.0, 0.0, -.4); //move to final position
@@ -94,5 +114,17 @@ class SceneManager{
         this.lowerBeak.translate(0.0, 0.0, -.4); //move to final position
         this.lowerBeak.scale(0.3, 0.1, 0.9);
 
+        //wings
+        this.leftWingJoint.translate(0.5,0.4,0);
+        this.leftWingJoint.rotate(-gWingAngle, 0, 0, 1);
+
+        this.leftWing.translate(0.5,0,0);
+        this.leftWing.scale(0.6, 0.1, 0.4);
+
+        this.rightWingJoint.translate(-0.5,0.6,0);
+        this.rightWingJoint.rotate(gWingAngle, 0, 0, 1);
+
+        this.rightWing.translate(-0.5,-0.2,0);
+        this.rightWing.scale(0.6, 0.1, 0.4);
     }
 }
