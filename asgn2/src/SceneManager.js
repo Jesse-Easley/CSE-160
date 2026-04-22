@@ -70,8 +70,8 @@ class SceneManager{
         this.head.color = [0.15, 0.15, 0.15, 1.0];
         this.upperBeak.color = [1.0, 0.5, 0.0, 1.0];
         this.lowerBeak.color = [1.0, 0.5, 0.0, 1.0];
-        this.leftWing.color = [1, 0.15, 0.15, 1.0];
-        this.rightWing.color = [1, 0.15, 0.15, 1.0];
+        this.leftWing.color = [0.18, 0.18, 0.18, 1.0];
+        this.rightWing.color = [0.18, 0.18, 0.18, 1.0];
 
     }
 
