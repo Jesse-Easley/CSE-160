@@ -81,6 +81,9 @@ function main(){
 function updateAnimationAngles(){
     gBeakAngle = (Math.sin(g_time * 0.008) + 1) * 2;
     document.getElementById("beakSlider").value = gBeakAngle;
+
+    gWingAngle = (Math.sin(g_time * 0.008)) * 20;
+    document.getElementById("wingSlider").value = gWingAngle;
 }
 
 function sendTextToHTML(text, htmlID){

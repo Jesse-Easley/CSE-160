@@ -92,7 +92,6 @@ class SceneManager{
 
         this.body.translate(0, -.3, 0);
         this.body.scale(.4, .5, .4);
-        this.body.rotate(0, 1, 0, 0); 
 
         this.belly.translate(0, 0, -0.22);
         this.belly.scale(0.5, 0.8, 0.4);
@@ -118,13 +117,13 @@ class SceneManager{
         this.leftWingJoint.translate(0.5,0.4,0);
         this.leftWingJoint.rotate(-gWingAngle, 0, 0, 1);
 
-        this.leftWing.translate(0.5,0,0);
-        this.leftWing.scale(0.6, 0.1, 0.4);
+        this.leftWing.translate(0.4,0,0);
+        this.leftWing.scale(0.5, 0.1, 0.4);
 
-        this.rightWingJoint.translate(-0.5,0.6,0);
+        this.rightWingJoint.translate(-0.5,0.4,0);
         this.rightWingJoint.rotate(gWingAngle, 0, 0, 1);
 
-        this.rightWing.translate(-0.5,-0.2,0);
-        this.rightWing.scale(0.6, 0.1, 0.4);
+        this.rightWing.translate(-0.4, 0,0);
+        this.rightWing.scale(0.5, 0.1, 0.4);
     }
 }
