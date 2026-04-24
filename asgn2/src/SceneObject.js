@@ -1,6 +1,6 @@
 class SceneObject{
     constructor(){
-        this.localMatrix = new Matrix4();
+        this.modelMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
 
         this.color = [1.0, 1.0, 1.0, 1.0];
@@ -11,24 +11,24 @@ class SceneObject{
     }
 
     rotate(angle, x, y, z){
-        this.localMatrix.rotate(angle, x, y, z);
+        this.modelMatrix.rotate(angle, x, y, z);
     }
 
     translate(x, y, z){
-        this.localMatrix.translate(x, y, z);
+        this.modelMatrix.translate(x, y, z);
     }
 
     scale(x, y, z){
-        this.localMatrix.scale(x, y, z);
+        this.modelMatrix.scale(x, y, z);
     }
 
     updateWorldMatrix(parentWorldMatrix){
         if(parentWorldMatrix){
             this.worldMatrix.set(parentWorldMatrix);
-            this.worldMatrix.multiply(this.localMatrix);
+            this.worldMatrix.multiply(this.modelMatrix);
         }
         else{
-            this.worldMatrix.set(this.localMatrix);
+            this.worldMatrix.set(this.modelMatrix);
         }
 
         for(let child of this.children){

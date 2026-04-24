@@ -79,16 +79,16 @@ class SceneManager{
      * @description Creates transformatin matrices for the various parts of the penguin
      */
     penguinTransforms(){
-        this.body.localMatrix.setIdentity();
-        this.belly.localMatrix.setIdentity();
-        this.neck.localMatrix.setIdentity();
-        this.head.localMatrix.setIdentity();
-        this.upperBeak.localMatrix.setIdentity();
-        this.lowerBeak.localMatrix.setIdentity();
-        this.leftWingJoint.localMatrix.setIdentity();
-        this.leftWing.localMatrix.setIdentity();
-        this.rightWingJoint.localMatrix.setIdentity();
-        this.rightWing.localMatrix.setIdentity();
+        this.body.modelMatrix.setIdentity();
+        this.belly.modelMatrix.setIdentity();
+        this.neck.modelMatrix.setIdentity();
+        this.head.modelMatrix.setIdentity();
+        this.upperBeak.modelMatrix.setIdentity();
+        this.lowerBeak.modelMatrix.setIdentity();
+        this.leftWingJoint.modelMatrix.setIdentity();
+        this.leftWing.modelMatrix.setIdentity();
+        this.rightWingJoint.modelMatrix.setIdentity();
+        this.rightWing.modelMatrix.setIdentity();
 
         this.body.translate(0, -.3, 0);
         this.body.scale(.4, .5, .4);
