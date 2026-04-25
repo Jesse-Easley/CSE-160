@@ -24,10 +24,8 @@ class Renderer{
     }
 
     initGLState(){
-        const gl = this.gl;
-
-        gl.enable(gl.DEPTH_TEST);
-        gl.clearColor(0.0, 0.4, 0.5, 1.0);
+        this.gl.enable(gl.DEPTH_TEST);
+        this.gl.clearColor(0.0, 0.4, 0.5, 1.0);
     }
 
     initShaderVariables(){
@@ -63,15 +61,11 @@ class Renderer{
     }
 
     initBuffers(){
-        const gl = this.gl;
-
-        //create buffer
-        this.buffer = gl.createBuffer();
+        this.buffer = this.gl.createBuffer();
     }
 
     clear(){
-        const gl = this.gl;
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     // drawCube(M, color){

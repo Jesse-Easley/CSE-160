@@ -1,6 +1,7 @@
 class Cube extends SceneObject{
     constructor(){
         super();
+        
         this.mesh = new Float32Array([
             //front face
             -0.5, -0.5,  0.5,

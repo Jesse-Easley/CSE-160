@@ -1,7 +1,7 @@
 class Cylinder extends SceneObject{
     constructor(){
         super();
-        this.mesh = this.generateCylinderVertices(16, 1, 1);
+        this.mesh = this.generateCylinderVertices(32, 1, 1);
     }
 
     generateCylinderVertices(segments, radius = 1, height = 1) {
