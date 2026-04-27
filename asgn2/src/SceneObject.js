@@ -7,10 +7,11 @@ class SceneObject{
 
         this.parent = null;
         this.children = [];
-
+        
         this.mesh = null;
     }
 
+    //added these so I wouldn't need to write ".localMatrix" every time
     rotate(angle, x, y, z){
         this.localMatrix.rotate(angle, x, y, z);
     }

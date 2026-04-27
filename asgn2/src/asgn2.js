@@ -3,16 +3,23 @@ let canvas;
 let gl;
 
 let gAnimalGlobalRotation = 45;
-let gViewingAngle = 15;
+let gViewingAngle = 0;
 
 const gViewingAngleMin = 0;
 const gViewingAngleMax = 80;
 
 let gBeakAngle = 0;
 let gWingAngle = 0;
+let gHipTwist = 0;
+let gLeftLegAngle = 0;
+let gRightLegAngle = 0;
+let gLeftFootAngle = 0;
+let gRightFootAngle = 0;
+let gBodyTwist = 0;
 
-let g_time = 0;
-let gAnimate = false;
+let gTime = 0;
+let gLast = 0;
+let gAnimate = true;
 
 let gClicked = false;
 
@@ -53,6 +60,26 @@ function addHTMLActions(scene){
     document.getElementById("wingSlider").addEventListener("input", function() {
         gWingAngle = Number(this.value);
         //scene.renderScene();
+    });
+
+    document.getElementById("hipTwistSlider").addEventListener("input", function() {
+        gHipTwist = Number(this.value);
+    });
+
+    document.getElementById("leftLegSlider").addEventListener("input", function() {
+        gLeftLegAngle = -Number(this.value);
+    });
+
+    document.getElementById("leftFootSlider").addEventListener("input", function() {
+        gLeftFootAngle = -Number(this.value);
+    });
+
+    document.getElementById("rightLegSlider").addEventListener("input", function() {
+        gRightLegAngle = -Number(this.value);
+    });
+
+    document.getElementById("rightFootSlider").addEventListener("input", function() {
+        gRightFootAngle = -Number(this.value);
     });
 
     document.getElementById("animToggle").addEventListener("change", function() {
@@ -125,28 +152,48 @@ function main(){
     //hookup html inputs
     addHTMLActions(scene);
 
-    // start animation loop
+    //start animation loop
     function tick() {
-        g_time = performance.now();
+        gTime = performance.now();
 
         if (gAnimate) {
             updateAnimationAngles();
         }
+
+        gLast = gTime;
         scene.renderScene();
         requestAnimationFrame(tick);
 
-        var duration = performance.now() - g_time;
-        sendTextToHTML("ms: " + Math.floor(duration) + ", fps: " + Math.floor(10000/duration), "fps");
+        var duration = performance.now() - gTime;
+        sendTextToHTML("ms: " + Math.floor(duration) + ", fps: " + Math.floor(1000/duration), "fps");
     }
     tick();
 }
 
 function updateAnimationAngles(){
-    gBeakAngle = (Math.sin(g_time * 0.008) + 1) * 2;
+    gBeakAngle = (Math.sin(gTime * 0.003) + 1) * 2;
     document.getElementById("beakSlider").value = gBeakAngle;
 
-    gWingAngle = (Math.sin(g_time * 0.008)) * 20;
+    gWingAngle = (Math.sin(gTime * 0.003) + 2) * 20;
     document.getElementById("wingSlider").value = gWingAngle;
+
+    gHipTwist = (Math.sin(gTime * 0.005)) * 15;
+    document.getElementById("hipTwistSlider").value = gHipTwist;
+
+    gBodyTwist = -gHipTwist*0.1;
+
+    gLeftLegAngle = (Math.sin(gTime * .005)) * 5;
+    document.getElementById("leftLegSlider").value = gLeftLegAngle;
+
+    gLeftFootAngle = -gLeftLegAngle*0.6;
+    document.getElementById("leftFootSlider").value = gLeftFootAngle;
+
+    gRightLegAngle = (Math.sin(gTime * .005 + Math.PI)) * 5;
+    document.getElementById("rightLegSlider").value = gRightLegAngle;
+
+    gRightFootAngle = -gRightLegAngle*0.6;
+    document.getElementById("rightFootSlider").value = gRightFootAngle;
+
 }
 
 function sendTextToHTML(text, htmlID){

@@ -27,8 +27,8 @@ class Cylinder extends SceneObject{
                 x1, halfH, z1,
 
                 0, -halfH, 0,
-                x1, -halfH, z1,
-                x0, -halfH, z0
+                x0, -halfH, z0,
+                x1, -halfH, z1
             );
         }
 

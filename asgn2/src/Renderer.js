@@ -68,60 +68,6 @@ class Renderer{
         this.gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
-    // drawCube(M, color){
-    //     const gl = this.gl;
-
-    //     //create and bind buffer
-    //     this.cubeBuffer = gl.createBuffer();
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeBuffer);
-
-    //     //send base cube to ARRAY_BUFFER
-    //     gl.bufferData(gl.ARRAY_BUFFER, this.cubeVertices, gl.STATIC_DRAW);
-
-    //     //assign buffer object to a_Position and enable assignment
-    //     gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
-    //     gl.enableVertexAttribArray(this.a_Position);
-
-    //     //create global rotation matrix
-    //     const globalRot = new Matrix4();
-    //     globalRot.rotate(-gViewingAngle, 1, 0, 0);
-    //     globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
-
-    //     //assign data to appropriate variables
-    //     gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)
-    //     gl.uniformMatrix4fv(this.u_ModelMatrix, false, M.elements);
-    //     gl.uniform4fv(this.u_FragColor, color);
-
-    //     gl.drawArrays(gl.TRIANGLES, 0, this.cubeVertices.length / 3);
-    // }
-
-    // drawCylinder(M, color){
-    //     const gl = this.gl;
-
-    //     //create and bind buffer
-    //     this.cylBuffer = gl.createBuffer();
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.cylBuffer);
-
-    //     //send base cube to ARRAY_BUFFER
-    //     gl.bufferData(gl.ARRAY_BUFFER, this.cylinderVertices, gl.STATIC_DRAW);
-
-    //     //assign buffer object to a_Position and enable assignment
-    //     gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
-    //     gl.enableVertexAttribArray(this.a_Position);
-
-    //     //create global rotation matrix
-    //     const globalRot = new Matrix4();
-    //     globalRot.rotate(-gViewingAngle, 1, 0, 0);
-    //     globalRot.rotate(gAnimalGlobalRotation, 0, 1, 0);
-
-    //     //assign data to appropriate variables
-    //     gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements)
-    //     gl.uniformMatrix4fv(this.u_ModelMatrix, false, M.elements);
-    //     gl.uniform4fv(this.u_FragColor, color);
-
-    //     gl.drawArrays(gl.TRIANGLES, 0, this.cylinderVertices.length / 3);
-    // }
-
     drawMesh(object){
         const gl = this.gl;
 
