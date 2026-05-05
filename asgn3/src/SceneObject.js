@@ -3,7 +3,7 @@ class SceneObject{
         this.localMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
 
-        this.color = [1.0, 1.0, 1.0, 1.0];
+        this.color = [1.0, 0.0, 1.0, 1.0];
 
         this.parent = null;
         this.children = [];

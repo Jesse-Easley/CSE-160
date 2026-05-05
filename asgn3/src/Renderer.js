@@ -3,22 +3,18 @@ var VSHADER_SOURCE =
      uniform mat4 u_ModelMatrix;
      uniform mat4 u_GlobalRotation;
 
-     attribute vec4 a_FragColor;
-     varying vec4 v_FragColor;
-
      attribute vec2 a_UV;
      varying vec2 v_UV;
 
      void main() {
         gl_Position = u_GlobalRotation * u_ModelMatrix * a_Position;
-        v_FragColor = a_FragColor;
         v_UV = a_UV;
      }`;
 
 var FSHADER_SOURCE = 
     `precision mediump float;
 
-     varying vec4 v_FragColor;
+     uniform vec4 u_FragColor;
 
      uniform float u_texColorWeight;
      uniform sampler2D u_Sampler;
@@ -26,7 +22,7 @@ var FSHADER_SOURCE =
 
      void main(){
         vec4 texColor = texture2D(u_Sampler, v_UV);
-        gl_FragColor = mix(v_FragColor, texColor, u_texColorWeight);
+        gl_FragColor = mix(u_FragColor, texColor, u_texColorWeight);
      }`;
 
 class Renderer{
@@ -75,7 +71,6 @@ class Renderer{
             console.log('Failed to get storage location of a_UV!');
             return;
         }
-
         
         //gets storage location of u_FragColor
         this.u_texColorWeight = gl.getUniformLocation(gl.program, 'u_texColorWeight');
@@ -84,10 +79,9 @@ class Renderer{
             return;
         }
 
-
         //gets storage location of a_FragColor
-        this.a_FragColor = gl.getAttribLocation(gl.program, 'a_FragColor');
-        if(!this.a_FragColor){
+        this.u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
+        if(!this.u_FragColor){
             console.log('Failed to get storage location of a_FragColor!');
             return;
         }
@@ -110,9 +104,13 @@ class Renderer{
         //send object mesh to ARRAY_BUFFER
         gl.bufferData(gl.ARRAY_BUFFER, object.mesh, gl.STATIC_DRAW);
 
+        var FSIZE = object.mesh.BYTES_PER_ELEMENT;
         //assign buffer object to a_Position and enable assignment
-        gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, FSIZE * 5, 0);
         gl.enableVertexAttribArray(this.a_Position);
+
+        gl.vertexAttribPointer(this.a_UV, 2, gl.FLOAT, false, FSIZE * 5, FSIZE * 2);
+        gl.enableVertexAttribArray(this.a_UV);
 
         let globalRot = new Matrix4();
         globalRot.rotate(-gViewingAngle, 1,0,0);
@@ -124,7 +122,8 @@ class Renderer{
 
         gl.vertexAttrib4fv(this.a_FragColor, object.color);
         gl.uniform1f(this.u_texColorWeight, 0.0);
+        gl.uniform4fv(this.u_FragColor, object.color);
 
-        gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 3);
+        gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 5);
     }
 }
