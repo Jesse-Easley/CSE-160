@@ -3,6 +3,8 @@ var VSHADER_SOURCE =
      uniform mat4 u_ModelMatrix;
      uniform mat4 u_GlobalRotation;
 
+     attribute vec3 a_Normal;
+
      attribute vec2 a_UV;
      varying vec2 v_UV;
 
@@ -85,6 +87,12 @@ class Renderer{
             console.log('Failed to get storage location of a_FragColor!');
             return;
         }
+
+        this.a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+        if(!this.a_Normal){
+            console.log('Failed to get storage location of a_Normal!');
+            return;
+        }
     }
 
     initBuffers(){
@@ -105,11 +113,14 @@ class Renderer{
         gl.bufferData(gl.ARRAY_BUFFER, object.mesh, gl.STATIC_DRAW);
 
         var FSIZE = object.mesh.BYTES_PER_ELEMENT;
-        //assign buffer object to a_Position and enable assignment
-        gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, FSIZE * 5, 0);
+        //assign and enable buffer attributes
+        gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, FSIZE * 8, 0);
         gl.enableVertexAttribArray(this.a_Position);
 
-        gl.vertexAttribPointer(this.a_UV, 2, gl.FLOAT, false, FSIZE * 5, FSIZE * 2);
+        gl.vertexAttribPointer(this.a_Normal, 3, gl.FLOAT, false, FSIZE * 8, FSIZE * 3);
+        gl.enableVertexAttribArray(this.a_Normal);
+
+        gl.vertexAttribPointer(this.a_UV, 2, gl.FLOAT, false, FSIZE * 8, FSIZE * 6);
         gl.enableVertexAttribArray(this.a_UV);
 
         let globalRot = new Matrix4();
@@ -124,6 +135,6 @@ class Renderer{
         gl.uniform1f(this.u_texColorWeight, 0.0);
         gl.uniform4fv(this.u_FragColor, object.color);
 
-        gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 5);
+        gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 8);
     }
 }
