@@ -2,17 +2,31 @@ var VSHADER_SOURCE =
     `attribute vec4 a_Position;
      uniform mat4 u_ModelMatrix;
      uniform mat4 u_GlobalRotation;
+
+     attribute vec4 a_FragColor;
      varying vec4 v_FragColor;
+
+     attribute vec2 a_UV;
+     varying vec2 v_UV;
+
      void main() {
         gl_Position = u_GlobalRotation * u_ModelMatrix * a_Position;
-        v_FragColor = a_Position;
+        v_FragColor = a_FragColor;
+        v_UV = a_UV;
      }`;
 
 var FSHADER_SOURCE = 
     `precision mediump float;
+
      varying vec4 v_FragColor;
+
+     uniform float u_texColorWeight;
+     uniform sampler2D u_Sampler;
+     varying vec2 v_UV;
+
      void main(){
-        gl_FragColor = v_FragColor;
+        vec4 texColor = texture2D(u_Sampler, v_UV);
+        gl_FragColor = mix(v_FragColor, texColor, u_texColorWeight);
      }`;
 
 class Renderer{
@@ -54,10 +68,27 @@ class Renderer{
             return;
         }
 
+
+        //gets storage location of a_UV
+        this.a_UV = gl.getAttribLocation(gl.program, 'a_UV');
+        if(!this.a_UV){
+            console.log('Failed to get storage location of a_UV!');
+            return;
+        }
+
+        
         //gets storage location of u_FragColor
-        this.u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
-        if(!this.u_FragColor){
-            console.log('Failed to get storage location of u_FragColor');
+        this.u_texColorWeight = gl.getUniformLocation(gl.program, 'u_texColorWeight');
+        if(!this.u_texColorWeight){
+            console.log('Failed to get storage location of u_texColorWeight');
+            return;
+        }
+
+
+        //gets storage location of a_FragColor
+        this.a_FragColor = gl.getAttribLocation(gl.program, 'a_FragColor');
+        if(!this.a_FragColor){
+            console.log('Failed to get storage location of a_FragColor!');
             return;
         }
     }
@@ -90,7 +121,9 @@ class Renderer{
         //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_ModelMatrix, false, object.worldMatrix.elements);
         gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements);
-        gl.uniform4fv(this.u_FragColor, object.color);
+
+        gl.vertexAttrib4fv(this.a_FragColor, object.color);
+        gl.uniform1f(this.u_texColorWeight, 0.0);
 
         gl.drawArrays(gl.TRIANGLES, 0, object.mesh.length / 3);
     }
