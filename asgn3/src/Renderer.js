@@ -134,8 +134,10 @@ class Renderer{
         globalRot.rotate(-gViewingAngle, 1,0,0);
         globalRot.rotate(gGlobalRotation,0,1,0);
 
+        //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_ModelMatrix, false, object.worldMatrix.elements);
         gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements);
+
 
         gl.drawElements(gl.TRIANGLES, mesh.indexCount, gl.UNSIGNED_SHORT, 0);
     }

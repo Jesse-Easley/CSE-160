@@ -27,7 +27,7 @@ class SceneManager{
         const texSky = textureManager.load("../resources/sky.jpg");
         const texGround = textureManager.load("../resources/ground_texture.png");
         var cubeMesh = generateCubeMesh(gl);
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
             const obj = new SceneObject();
 
             function randomTexture() {
