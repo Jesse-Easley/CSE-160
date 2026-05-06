@@ -33,10 +33,6 @@ function addHTMLActions(scene){
         gClicked = false;
     })
 
-    canvas.addEventListener("mouseleave", () => {
-        gClicked = false;
-    })
-
     canvas.addEventListener("mousemove", (event) => {
         if(!gClicked) return;
 
@@ -44,7 +40,6 @@ function addHTMLActions(scene){
         gGlobalRotation -= event.movementX * 0.75;
         gViewingAngle += event.movementY  * 0.75;
 
-        scene.renderScene();
     })
     return;
 }
@@ -55,15 +50,42 @@ function main(){
 
     //create renderer
     const render = new Renderer(gl);
+    const textureManager = new TextureManager(gl);
 
     //create scene
-    const scene = new SceneManager();
-    scene.setRenderer(render);
+    const scene = new SceneManager(render, textureManager);
 
     //hookup html inputs
     addHTMLActions(scene);
 
-    scene.renderScene();
+    let lastFpsTime = 0;
+    let frameCount = 0;
+    let fps = 0;
+    function tick() {
+        const frameStart = performance.now();
+
+        scene.renderScene();
+
+        //render time
+        const renderTime = performance.now() - frameStart;
+
+        //fps counter
+        frameCount++;
+        const now = performance.now();
+        if (now - lastFpsTime >= 1000) {
+            fps = frameCount;
+            frameCount = 0;
+            lastFpsTime = now;
+        }
+
+        sendTextToHTML(
+            `render time: ${renderTime.toFixed(2)} ms | fps: ${fps}`,
+            "fps"
+        );
+
+        requestAnimationFrame(tick);
+    }
+    tick();
 }
 
 function sendTextToHTML(text, htmlID){

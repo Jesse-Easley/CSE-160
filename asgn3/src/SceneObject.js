@@ -1,14 +1,19 @@
 class SceneObject{
-    constructor(){
+    constructor(mesh = null, texture = null){
         this.localMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
 
-        this.color = [1.0, 0.0, 1.0, 1.0];
+        this.color = [1.0, 0.0, 0.0, 1.0];
+
+        this.mesh = mesh;
+
+        this.texture = texture;
+        this.texColorWeight = 1.0;
 
         this.parent = null;
         this.children = [];
         
-        this.mesh = null;
+        
     }
 
     //added these so I wouldn't need to write ".localMatrix" every time
@@ -24,6 +29,7 @@ class SceneObject{
         this.localMatrix.scale(x, y, z);
     }
 
+    //world matrix contains final world transform for the object after updateWorldMatrix
     updateWorldMatrix(parentWorldMatrix){
         if(parentWorldMatrix){
             this.worldMatrix.set(parentWorldMatrix);
