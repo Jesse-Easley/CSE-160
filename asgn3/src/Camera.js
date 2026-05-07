@@ -15,16 +15,17 @@ class Camera{
         this.projectionMatrix = new Matrix4();
         this.projectionMatrix.setPerspective(this.fov, canvas.width/canvas.height, 0.1, 1000);
     
-        this.moveSpeed = 0.05;
+        this.moveSpeed = 5.0;
         this.alpha = 2;
     }
 
-    moveForward(){
+    moveForward(deltaTime = 1){
+        //forward vector
         let f = new Vector3();
-        f.set(this.at);
-        f.sub(this.eye);
+        f.set(this.at).sub(this.eye);
+
         f.normalize();
-        f.mul(this.moveSpeed);
+        f.mul(this.moveSpeed * deltaTime);
 
         this.eye.add(f);
         this.at.add(f);
@@ -32,12 +33,13 @@ class Camera{
         this.updateView();
     }
 
-    moveBackward(){
+    moveBackward(deltaTime = 1){
+        //backward vector
         let b = new Vector3();
-        b.set(this.eye);
-        b.sub(this.at);
+        b.set(this.eye).sub(this.at);
+
         b.normalize();
-        b.mul(this.moveSpeed);
+        b.mul(this.moveSpeed * deltaTime);
 
         this.eye.add(b);
         this.at.add(b);
@@ -45,25 +47,27 @@ class Camera{
         this.updateView();
     }
 
-    moveLeft(){
+    moveLeft(deltaTime = 1){
+        //forward vector
         let f = new Vector3();
-        f.set(this.at);
-        f.sub(this.eye);
+        f.set(this.at).sub(this.eye);
+
         let s = Vector3.cross(this.up, f);
-        s.mul(this.moveSpeed);
+        s.mul(this.moveSpeed * deltaTime);
         this.eye.add(s);
         this.at.add(s);
 
         this.updateView();
     }
 
-    
-    moveRight(){
+    moveRight(deltaTime = 1){
+        //forward vector
         let f = new Vector3();
-        f.set(this.at);
-        f.sub(this.eye);
+        f.set(this.at).sub(this.eye);
+
         let s = Vector3.cross(f, this.up);
-        s.mul(this.moveSpeed);
+        s.mul(this.moveSpeed * deltaTime);
+        
         this.eye.add(s);
         this.at.add(s);
 
@@ -71,14 +75,14 @@ class Camera{
     }
 
     panLeft(){
+        //forward vector
         let f = new Vector3();
-        f.set(this.at);
-        f.sub(this.eye);
+        f.set(this.at).sub(this.eye);
         
-        let rotationMatrix = new Matrix4();
-        rotationMatrix.setRotate(this.alpha, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+        let rot = new Matrix4();
+        rot.setRotate(this.alpha, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 
-        let f_prime = rotationMatrix.multiplyVector3(f);
+        let f_prime = rot.multiplyVector3(f);
         f_prime.normalize();
 
         this.at.set(new Vector3(this.eye.elements)).add(f_prime);
@@ -87,14 +91,14 @@ class Camera{
     }
 
     panRight(){
+        //forward vector
         let f = new Vector3();
-        f.set(this.at);
-        f.sub(this.eye);
+        f.set(this.at).sub(this.eye);
         
-        let rotationMatrix = new Matrix4();
-        rotationMatrix.setRotate(-this.alpha, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+        let rot = new Matrix4();
+        rot.setRotate(-this.alpha, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 
-        let f_prime = rotationMatrix.multiplyVector3(f);
+        let f_prime = rot.multiplyVector3(f);
         f_prime.normalize();
 
         this.at.set(new Vector3(this.eye.elements)).add(f_prime);
@@ -102,13 +106,16 @@ class Camera{
         this.updateView();
     }
 
-    //used for mouse camera control
-    yaw(angle) {
+    //used for horizontal mouse camera control
+    yaw(alpha) {
+        //forward vector
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
         let rot = new Matrix4();
-        rot.setRotate(angle, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+
+        //negative because +x mouse movement is panRight
+        rot.setRotate(-alpha, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 
         let f_prime = rot.multiplyVector3(f);
         f_prime.normalize();
@@ -117,18 +124,19 @@ class Camera{
         this.updateView();
     }
 
-    pitch(angle) {
+    //used for vertical mouse camera control
+    pitch(alpha) {
         //forward vector
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
-        //right vector = f × up
         let right = Vector3.cross(f, this.up);
         right.normalize();
 
-        //rotation matrix around right axis
         let rot = new Matrix4();
-        rot.setRotate(angle, right.elements[0], right.elements[1], right.elements[2]);
+
+        //negative because +y is down on canvas
+        rot.setRotate(-alpha, right.elements[0], right.elements[1], right.elements[2]);
 
         let f_prime = rot.multiplyVector3(f);
         f_prime.normalize();

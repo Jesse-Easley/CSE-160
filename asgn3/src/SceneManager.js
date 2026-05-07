@@ -6,41 +6,36 @@ class SceneManager{
 
         //hardcoded for testing purposes
         var cubeMesh = generateCubeMesh(gl);
+        cubeMesh.uploadBuffers();
         
         const texSky = textureManager.load("../resources/sky.jpg");
         const texGround = textureManager.load("../resources/ground_texture.png");
 
-        let skybox = new SceneObject();
-        skybox.mesh = cubeMesh;
-        skybox.texture = texSky
+        let skybox = new SceneObject(cubeMesh, texSky);
+
         this.root.addChild(skybox);
         skybox.texColorWeight = 0.0;
         skybox.color = [0.3, 0.4, 0.8, 1.0];
         skybox.scale(100,100,100);
 
-        let ground = new SceneObject();
-        ground.mesh = cubeMesh;
-        ground.texture = texGround;
+        let ground = new SceneObject(cubeMesh, texGround);
         this.root.addChild(ground);
         ground.scale(100, 0.1, 100);
         ground.translate(0, 0, 0);
+
         
         for (let i = 0; i < 5; i++) {
-            const obj = new SceneObject();
-
             function randomTexture() {
                 return Math.random() < 0.5 ? texSky : texGround;
             }
 
-            //mesh + texture
-            obj.mesh = cubeMesh;
-            obj.texture = randomTexture();
+            const obj = new SceneObject(cubeMesh, randomTexture());
 
             //random scale
             const s = Math.random() * 5 + 0.2;
             obj.scale(s, s, s);
 
-            // random position
+            //random position
             const x = (Math.random() - 0.5)*20;
             const y = (Math.random() - 0.5)*20;
             const z = (Math.random() - 0.5)*20;

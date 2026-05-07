@@ -43,21 +43,21 @@ function addHTMLActions(camera){
         canvas.requestPointerLock();
     });
 
-    document.addEventListener("mousemove", (e) => {
+    document.addEventListener("mousemove", (event) => {
         if (document.pointerLockElement === canvas) {
-            const sensitivity = 0.2;
+            const sensitivity = 0.18;
 
-            camera.yaw(-e.movementX * sensitivity);
-            camera.pitch(-e.movementY * sensitivity);  //negative because moving mouse up should look up
+            camera.yaw(event.movementX * sensitivity);
+            camera.pitch(event.movementY * sensitivity);
         }
     });
 
-    window.addEventListener("keydown", (e) => {
-        keys[e.key] = true;
+    window.addEventListener("keydown", (event) => {
+        keys[event.key] = true;
     });
 
-    window.addEventListener("keyup", (e) => {
-        keys[e.key] = false;
+    window.addEventListener("keyup", (event) => {
+        keys[event.key] = false;
     });
 }
 
@@ -75,27 +75,32 @@ function main(){
     //hookup html inputs
     addHTMLActions(camera);
 
-    let lastFpsTime = 0;
+    let lastFrameTime = performance.now();
+    let lastFpsTime = lastFrameTime;
     let frameCount = 0;
     let fps = 0;
+
     function tick() {
-        const frameStart = performance.now();
+        const now = performance.now();
 
-        if (keys['w']) camera.moveForward();
-        if (keys['s']) camera.moveBackward();
-        if (keys['a']) camera.moveLeft();
-        if (keys['d']) camera.moveRight();
-        if (keys['ArrowLeft']) camera.panLeft();
-        if (keys['ArrowRight']) camera.panRight();
+        const deltaTime = (now - lastFrameTime) / 1000;
+        lastFrameTime = now;
 
+        //keyboard control
+        if (keys['w']) camera.moveForward(deltaTime);
+        if (keys['s']) camera.moveBackward(deltaTime);
+        if (keys['a']) camera.moveLeft(deltaTime);
+        if (keys['d']) camera.moveRight(deltaTime);
+        if (keys['q']) camera.panLeft();
+        if (keys['e']) camera.panRight();
+
+        //time to render
+        const renderStart = performance.now();
         scene.renderScene();
-
-        //render time
-        const renderTime = performance.now() - frameStart;
+        const renderTime = performance.now() - renderStart;
 
         //fps counter
         frameCount++;
-        const now = performance.now();
         if (now - lastFpsTime >= 1000) {
             fps = frameCount;
             frameCount = 0;
@@ -103,7 +108,7 @@ function main(){
         }
 
         sendTextToHTML(
-            `render time: ${renderTime.toFixed(2)} ms | fps: ${fps}`,
+            `render: ${renderTime.toFixed(2)} ms | fps: ${fps}`,
             "fps"
         );
 

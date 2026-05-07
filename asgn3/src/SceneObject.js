@@ -12,8 +12,6 @@ class SceneObject{
 
         this.parent = null;
         this.children = [];
-        
-        
     }
 
     //added these so I wouldn't need to write ".localMatrix" every time

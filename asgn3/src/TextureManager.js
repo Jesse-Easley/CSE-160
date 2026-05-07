@@ -2,6 +2,8 @@ class TextureManager {
     constructor(gl) {
         this.gl = gl;
         this.cache = new Map();
+
+        this.nextTexID = 0;
     }
 
     load(path) {
@@ -12,6 +14,7 @@ class TextureManager {
 
         const gl = this.gl;
         var texture = gl.createTexture();
+        texture._id = this.nextTexID++;
 
         //put it in the cache
         this.cache.set(path, texture);
@@ -30,7 +33,7 @@ class TextureManager {
 
             gl.generateMipmap(gl.TEXTURE_2D);
 
-            console.log("Texture loaded!");
+            console.log(`Loaded texture ${texture._id}: ${path}`);
         };
 
         image.src = path;
