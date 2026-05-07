@@ -24,6 +24,9 @@ class Camera{
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
+        //remove y component
+        f.set(new Vector3([f.elements[0], f.elements[1], f.elements[2]]));
+
         f.normalize();
         f.mul(this.moveSpeed * deltaTime);
 
@@ -37,6 +40,9 @@ class Camera{
         //backward vector
         let b = new Vector3();
         b.set(this.eye).sub(this.at);
+
+        //remove y component
+        b.set(new Vector3([b.elements[0], b.elements[1], b.elements[2]]));
 
         b.normalize();
         b.mul(this.moveSpeed * deltaTime);
@@ -52,8 +58,13 @@ class Camera{
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
+        //get left direction
         let s = Vector3.cross(this.up, f);
+
+        //multiply by move speed
+        s.normalize();
         s.mul(this.moveSpeed * deltaTime);
+
         this.eye.add(s);
         this.at.add(s);
 
@@ -65,7 +76,11 @@ class Camera{
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
+        
+        //get right direction
         let s = Vector3.cross(f, this.up);
+
+        s.normalize();
         s.mul(this.moveSpeed * deltaTime);
         
         this.eye.add(s);

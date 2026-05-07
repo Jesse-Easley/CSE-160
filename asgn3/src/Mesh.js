@@ -1,10 +1,10 @@
 class Mesh{
-    static s_id = 0;
+    static _id = 0;
     constructor(gl, vertices, indices){
         this.vertices = vertices;
         this.indices = indices;
 
-        this.id = Mesh.s_id++;
+        this.id = Mesh._id++;
         
         this.indexCount = this.indices.length;
 

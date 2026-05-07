@@ -2,59 +2,37 @@ class SceneManager{
     constructor(renderer, textureManager){
         //creates root from which all other objects inherit transforms
         this.root = new SceneObject();
-        this.renderer = renderer
+        this.renderer = renderer;
+        this.textureManager = textureManager;
 
         this.batches = [];
 
         //hardcoded for testing purposes
-        var cubeMesh = generateCubeMesh(gl);
+        const cubeMesh = generateCubeMesh(gl);
         cubeMesh.createBuffers();
         cubeMesh.uploadBuffers();
         
-        const texSky = textureManager.load("../resources/sky.jpg");
-        const texGround = textureManager.load("../resources/ground_texture.png");
 
-        let skybox = new SceneObject(cubeMesh, texSky);
+        const skyMat = new Material;
+        skyMat.textures.diffuse = this.textureManager.load("../resources/sky.jpg", "diffuse");
+
+        const groundMat = new Material();
+        groundMat.textures.diffuse = this.textureManager.load("../resources/ground_texture.png", "diffuse");
+
+        this.generateLevel();
+
+        let skybox = new SceneObject(cubeMesh, skyMat);
         this.root.addChild(skybox);
-        skybox.texColorWeight = 0.0;
-        skybox.color = [0.3, 0.4, 0.8, 1.0];
+        skybox.material.texColorWeight = 0.0;
+        skybox.material.color = [0.3, 0.4, 0.8, 1.0];
         skybox.scale(100,100,100);
+        skybox.isStatic = true;
 
-        let ground = new SceneObject(cubeMesh, texGround);
+        let ground = new SceneObject(cubeMesh, groundMat);
         this.root.addChild(ground);
-        ground.scale(100, 0.1, 100);
-        ground.translate(0, 0, 0);
-        
-        for (let i = 0; i < 1000000; i++) {
-            function randomTexture() {
-                return Math.random() < 0.5 ? texSky : texGround;
-            }
-
-            const obj = new SceneObject(cubeMesh, randomTexture());
-
-            //random position
-            const x = (Math.random() - 0.5)*100;
-            const y = (Math.random())*100;
-            const z = (Math.random() - 0.5)*100;
-            obj.translate(x, y, z);
-
-            //random rotation
-            obj.rotate(
-                Math.random() * 360,
-                Math.random(),
-                Math.random(),
-                Math.random()
-            );
-
-            //random scale
-            const s = Math.random() * .01 + 0.2;
-            obj.scale(s, s, s);
-
-            obj.isStatic = true;
-
-            //add to scene
-            this.root.addChild(obj);
-        }
+        ground.translate(0, 0.45, 0);
+        ground.scale(32, 0.1, 32);
+        ground.isStatic = true;
 
         this.batchStatics();
     }
@@ -82,6 +60,7 @@ class SceneManager{
         //get static objects
         const staticObjects = [];
         this.collectStatics(this.root, staticObjects);
+        console.log(`${staticObjects.length} static objects collected!`);
 
         //seperate all statics into batches
         const groups = this.groupStatics(staticObjects);
@@ -91,8 +70,10 @@ class SceneManager{
             let newMesh = this.mergeMeshes(group.objects);
             newMesh.createBuffers();
             newMesh.uploadBuffers();
-            this.batches.push(new SceneObject(newMesh, group.texture));
+
+            this.batches.push(new SceneObject(newMesh, group.material));
         }
+        console.log(`${this.batches.length} static batches created!`);
 
         //mark batched objects
         for(let obj of staticObjects){
@@ -114,12 +95,11 @@ class SceneManager{
         let groups = new Map();
 
         for(const object of staticObjects){
-            const key = object.texture.id + "|" + object.mesh.id;
+            const key = object.material.id;
 
             if(!groups.has(key)){
                 groups.set(key, {
-                    texture: object.texture,
-                    mesh: object.mesh,
+                    material: object.material,
                     objects: []
                 });
             }
@@ -178,6 +158,69 @@ class SceneManager{
 
         for(let child of object.children){
             this.renderSceneGraph(child);
+        }
+    }
+
+    generateLevel(){
+        const lvlArray = [
+            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        ];
+
+        const wallMat = new Material();
+        wallMat.textures.diffuse = this.textureManager.load("../resources/marble_cliff_01_diff_1k.png");;
+        wallMat.textures.ao = this.textureManager.load("../resources/marble_cliff_01_ao_1k.png");;
+
+        const wallMesh = generateCubeMesh(gl);
+
+        //iterate through array and place
+        for(let row = 0; row < lvlArray.length; row++){
+            for(let col = 0; col < lvlArray[row].length; col++){
+                for(let i = 0; i < lvlArray[row][col]; i++){
+                    let obj = new SceneObject();
+
+                    let worldCol = 16 - col;
+                    let worldRow = 16 - row;
+                    
+                    obj.translate(worldCol,i+1,worldRow);
+
+                    obj.mesh = wallMesh;
+                    obj.material = wallMat;
+                    obj.isStatic = true;
+
+                    this.root.addChild(obj);
+                }
+            }
         }
     }
 }

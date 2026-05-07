@@ -25,12 +25,20 @@ var FSHADER_SOURCE =
      varying vec3 v_Normal;
 
      uniform float u_texColorWeight;
-     uniform sampler2D u_Sampler;
+
+     uniform sampler2D u_diffuse;
+     uniform sampler2D u_ao;
+     
      varying vec2 v_UV;
 
      void main(){
-        vec4 texColor = texture2D(u_Sampler, v_UV);
-        gl_FragColor = mix(u_FragColor, texColor, u_texColorWeight);
+        vec4 texColor = texture2D(u_diffuse, v_UV);
+        float ao = texture2D(u_ao, v_UV).r;
+
+        texColor.rgb *= ao;
+        vec4 mixed = mix(u_FragColor, texColor, u_texColorWeight);
+
+        gl_FragColor = mixed;
      }`;
 
 class Renderer{
@@ -105,11 +113,6 @@ class Renderer{
             console.log('Failed to get storage location of a_Normal!');
             return;
         }
-
-        this.u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler');
-        if (!this.u_Sampler) {
-            console.log("Failed to get u_Sampler");
-        }
     }
 
     clear(){
@@ -134,13 +137,21 @@ class Renderer{
         gl.vertexAttribPointer(this.a_UV, 2, gl.FLOAT, false, FSIZE * 8, FSIZE * 6);
         gl.enableVertexAttribArray(this.a_UV);
 
-        //activate and bind texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, object.texture);
-        gl.uniform1i(this.u_Sampler, 0);
+        //activate and bind material textures
+        for (const [name, texture] of Object.entries(object.material.textures)){
+            if (!texture) continue; // skip missing maps
 
-        gl.uniform1f(this.u_texColorWeight, object.texColorWeight);
-        gl.uniform4fv(this.u_FragColor, object.color);
+            const unit = MATERIAL_TEXTURE_SLOTS[name];
+
+            gl.activeTexture(gl.TEXTURE0 + unit);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            const loc = gl.getUniformLocation(gl.program, `u_${name}`);
+            gl.uniform1i(loc, unit);
+        }
+
+        gl.uniform1f(this.u_texColorWeight, object.material.texColorWeight);
+        gl.uniform4fv(this.u_FragColor, object.material.color);
 
         //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_ModelMatrix, false, object.worldMatrix.elements);

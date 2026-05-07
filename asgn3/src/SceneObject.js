@@ -1,14 +1,11 @@
 class SceneObject{
-    constructor(mesh = null, texture = null){
+    constructor(mesh = null, material = null){
         this.localMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
-
-        this.color = [1.0, 0.0, 0.0, 1.0];
-
+        
         this.mesh = mesh;
 
-        this.texture = texture;
-        this.texColorWeight = 1.0;
+        this.material = material;
 
         this.isStatic = false;
         this.isBatched = false;
