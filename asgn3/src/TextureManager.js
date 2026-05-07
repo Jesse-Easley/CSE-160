@@ -14,7 +14,7 @@ class TextureManager {
 
         const gl = this.gl;
         var texture = gl.createTexture();
-        texture._id = this.nextTexID++;
+        texture.id = this.nextTexID++;
 
         //put it in the cache
         this.cache.set(path, texture);

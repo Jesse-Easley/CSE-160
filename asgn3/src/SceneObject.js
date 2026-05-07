@@ -10,6 +10,9 @@ class SceneObject{
         this.texture = texture;
         this.texColorWeight = 1.0;
 
+        this.isStatic = false;
+        this.isBatched = false;
+
         this.parent = null;
         this.children = [];
     }

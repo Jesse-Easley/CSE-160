@@ -1,17 +1,19 @@
 class Mesh{
-    static _id = 0;
+    static s_id = 0;
     constructor(gl, vertices, indices){
         this.vertices = vertices;
         this.indices = indices;
 
-        this._id = Mesh._id++;
-
-        this.vertexBuffer = gl.createBuffer();
-        this.indiceBuffer = gl.createBuffer();
+        this.id = Mesh.s_id++;
         
         this.indexCount = this.indices.length;
 
-        console.log(`Mesh ${this._id} created!`);
+        console.log(`Mesh ${this.id} created!`);
+    }
+
+    createBuffers(){
+        this.vertexBuffer = gl.createBuffer();
+        this.indiceBuffer = gl.createBuffer();
     }
 
     uploadBuffers(){
@@ -21,7 +23,7 @@ class Mesh{
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indiceBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
     
-        console.log(`Mesh ${this._id} buffers uploaded!`);
+        console.log(`Mesh ${this.id} buffers uploaded!`);
     }
 
     bind(gl){
