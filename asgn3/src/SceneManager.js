@@ -23,9 +23,9 @@ class SceneManager{
         ground.texture = texGround;
         this.root.addChild(ground);
         ground.scale(100, 0.1, 100);
-        ground.translate(0, -2, 0);
+        ground.translate(0, 0, 0);
         
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 5; i++) {
             const obj = new SceneObject();
 
             function randomTexture() {
@@ -37,13 +37,13 @@ class SceneManager{
             obj.texture = randomTexture();
 
             //random scale
-            const s = Math.random() * 0.5 + 0.2;
+            const s = Math.random() * 5 + 0.2;
             obj.scale(s, s, s);
 
             // random position
-            const x = (Math.random() - 0.5)*1.5;
-            const y = (Math.random() - 0.5)*1.5;
-            const z = (Math.random() - 0.5)*1.5;
+            const x = (Math.random() - 0.5)*20;
+            const y = (Math.random() - 0.5)*20;
+            const z = (Math.random() - 0.5)*20;
             obj.translate(x, y, z);
 
             //random rotation

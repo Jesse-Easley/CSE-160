@@ -22,6 +22,10 @@ function setupWebGL(){
     }
 }
 
+function handleMouseMove(dx, dy) {
+    
+}
+
 function addHTMLActions(camera){
     //
     // SLIDER EVENTS
@@ -35,22 +39,17 @@ function addHTMLActions(camera){
     // CAMERA CONTROL EVENTS
     //
 
-    canvas.addEventListener("mousedown", () => {
-        gClicked = true;
+    canvas.addEventListener("click", () => {
+        canvas.requestPointerLock();
     });
 
-    canvas.addEventListener("mouseup", () => {
-        gClicked = false;
-    });
+    document.addEventListener("mousemove", (e) => {
+        if (document.pointerLockElement === canvas) {
+            const sensitivity = 0.2;
 
-    canvas.addEventListener("mouseleave", () => {
-        gClicked = false;
-    });
-
-    canvas.addEventListener("mousemove", (event) => {
-        if (!gClicked) return;
-
-        camera.panLeft(event.movementX * 0.1);
+            camera.yaw(-e.movementX * sensitivity);
+            camera.pitch(-e.movementY * sensitivity);  //negative because moving mouse up should look up
+        }
     });
 
     window.addEventListener("keydown", (e) => {

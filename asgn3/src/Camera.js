@@ -2,8 +2,8 @@ class Camera{
     constructor(){
         this.fov = 90.0;
 
-        this.eye = new Vector3([0,0,0]);
-        this.at = new Vector3([0,0,-1]);
+        this.eye = new Vector3([0,1,0]);
+        this.at = new Vector3([0,1,-1]);
         this.up = new Vector3([0,1,0]);
 
         this.viewMatrix = new Matrix4();
@@ -102,12 +102,43 @@ class Camera{
         this.updateView();
     }
 
-    pitchUp(){
+    //used for mouse camera control
+    yaw(angle) {
+        let f = new Vector3();
+        f.set(this.at).sub(this.eye);
 
+        let rot = new Matrix4();
+        rot.setRotate(angle, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+
+        let f_prime = rot.multiplyVector3(f);
+        f_prime.normalize();
+
+        this.at.set(this.eye).add(f_prime);
+        this.updateView();
     }
 
-    pitchDown(){
+    pitch(angle) {
+        //forward vector
+        let f = new Vector3();
+        f.set(this.at).sub(this.eye);
 
+        //right vector = f × up
+        let right = Vector3.cross(f, this.up);
+        right.normalize();
+
+        //rotation matrix around right axis
+        let rot = new Matrix4();
+        rot.setRotate(angle, right.elements[0], right.elements[1], right.elements[2]);
+
+        let f_prime = rot.multiplyVector3(f);
+        f_prime.normalize();
+
+        //prevent flipping upside down
+        let newUp = Vector3.cross(right, f_prime);
+        if (newUp.elements[1] <= 0.01) return;  // simple clamp
+
+        this.at.set(this.eye).add(f_prime);
+        this.updateView();
     }
 
     setFov(newFov){

@@ -44,7 +44,7 @@ class Renderer{
     }
 
     initGLState(){
-        this.gl.enable(gl.DEPTH_TEST);
+        this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     }
 
