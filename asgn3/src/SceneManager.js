@@ -5,28 +5,26 @@ class SceneManager{
         this.renderer = renderer
 
         //hardcoded for testing purposes
-        // var cubeMesh = generateCubeMesh(gl);
-        // let c = new SceneObject(cubeMesh, textureManager.load("../resources/sky.jpg"));
-        // this.root.addChild(c);
-
-        // let v = new SceneObject();
-        // v.mesh = cubeMesh;
-        // v.texture = textureManager.load("../resources/ground_texture.png");
-        // this.root.addChild(v);
-        // v.scale(0.5,0.5,0.5);
-        // v.translate(1,0,0);
-
-        // let d = new SceneObject();
-        // d.mesh = cubeMesh;
-        // d.texture = textureManager.load("../resources/sky.jpg");
-        // v.addChild(d);
-        // d.texColorWeight = 0.5;
-        // d.scale(0.5,0.5,0.5);
-        // d.translate(1,0,0);
-
+        var cubeMesh = generateCubeMesh(gl);
+        
         const texSky = textureManager.load("../resources/sky.jpg");
         const texGround = textureManager.load("../resources/ground_texture.png");
-        var cubeMesh = generateCubeMesh(gl);
+
+        let skybox = new SceneObject();
+        skybox.mesh = cubeMesh;
+        skybox.texture = texSky
+        this.root.addChild(skybox);
+        skybox.texColorWeight = 0.0;
+        skybox.color = [0.3, 0.4, 0.8, 1.0];
+        skybox.scale(100,100,100);
+
+        let ground = new SceneObject();
+        ground.mesh = cubeMesh;
+        ground.texture = texGround;
+        this.root.addChild(ground);
+        ground.scale(100, 0.1, 100);
+        ground.translate(0, -2, 0);
+        
         for (let i = 0; i < 4; i++) {
             const obj = new SceneObject();
 

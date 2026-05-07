@@ -1,7 +1,8 @@
 var VSHADER_SOURCE = 
     `attribute vec4 a_Position;
      uniform mat4 u_ModelMatrix;
-     uniform mat4 u_GlobalRotation;
+     uniform mat4 u_ViewMatrix;
+     uniform mat4 u_ProjectionMatrix;
 
      attribute vec3 a_Normal;
      varying vec3 v_Normal;
@@ -10,7 +11,7 @@ var VSHADER_SOURCE =
      varying vec2 v_UV;
 
      void main() {
-        gl_Position = u_GlobalRotation * u_ModelMatrix * a_Position;
+        gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * a_Position;
 
         v_UV = a_UV;
         v_Normal = a_Normal;
@@ -33,8 +34,9 @@ var FSHADER_SOURCE =
      }`;
 
 class Renderer{
-    constructor(gl){
+    constructor(gl, camera){
         this.gl = gl;
+        this.camera = camera;
 
         initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
         this.initGLState();
@@ -64,12 +66,18 @@ class Renderer{
         }
 
         //gets storage location of u_ModelMatrix
-        this.u_GlobalRotation = gl.getUniformLocation(gl.program, 'u_GlobalRotation');
-        if(this.u_GlobalRotation == -1){
-            console.log('Failed to get storage location of u_GlobalRotation');
+        this.u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+        if(this.u_ViewMatrix == -1){
+            console.log('Failed to get storage location of u_ViewMatrix');
             return;
         }
 
+        //gets storage location of u_ProjectionMatrix
+        this.u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
+        if(this.u_ProjectionMatrix == -1){
+            console.log('Failed to get storage location of u_ProjectionMatrix');
+            return;
+        }
 
         //gets storage location of a_UV
         this.a_UV = gl.getAttribLocation(gl.program, 'a_UV');
@@ -96,6 +104,11 @@ class Renderer{
         if(this.a_Normal == -1){
             console.log('Failed to get storage location of a_Normal!');
             return;
+        }
+
+        this.u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler');
+        if (!this.u_Sampler) {
+            console.log("Failed to get u_Sampler");
         }
     }
 
@@ -128,16 +141,11 @@ class Renderer{
 
         gl.uniform1f(this.u_texColorWeight, object.texColorWeight);
         gl.uniform4fv(this.u_FragColor, object.color);
-            
-        //calculate rotation
-        let globalRot = new Matrix4();
-        globalRot.rotate(-gViewingAngle, 1,0,0);
-        globalRot.rotate(gGlobalRotation,0,1,0);
 
         //assign data to appropriate variables
         gl.uniformMatrix4fv(this.u_ModelMatrix, false, object.worldMatrix.elements);
-        gl.uniformMatrix4fv(this.u_GlobalRotation, false, globalRot.elements);
-
+        gl.uniformMatrix4fv(this.u_ViewMatrix, false, this.camera.viewMatrix.elements);
+        gl.uniformMatrix4fv(this.u_ProjectionMatrix, false, this.camera.projectionMatrix.elements);
 
         gl.drawElements(gl.TRIANGLES, mesh.indexCount, gl.UNSIGNED_SHORT, 0);
     }

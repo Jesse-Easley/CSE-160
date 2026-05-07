@@ -13,6 +13,7 @@
     <script src="TextureManager.js"></script>
     <script src="SceneManager.js"></script>
     <script src="SceneObject.js"></script>
+    <script src="Camera.js"></script>
 
     <script src="Mesh.js"></script>
     <script src="Cube.js"></script>
@@ -29,6 +30,11 @@
     </div>
     <div>
         <span id="fps"></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="fovSlider">FOV: </label>
+        <input type="range" id="fovSlider" min="30" max="120" value="60">
+        <span id="fovValue">60</span>
     </div>
 </body>
 </html>

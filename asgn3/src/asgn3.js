@@ -7,6 +7,8 @@ let gViewingAngle = 0;
 
 let gClicked = false;
 
+let keys = {};
+
 //sets up webgl contex
 function setupWebGL(){
     //get canvas element
@@ -20,49 +22,72 @@ function setupWebGL(){
     }
 }
 
-function addHTMLActions(scene){
+function addHTMLActions(camera){
     //
-    // MOUSE CONTROL EVENTS
+    // SLIDER EVENTS
+    //
+    document.getElementById("fovSlider").addEventListener("input", function() {
+        camera.setFov(this.value);
+        sendTextToHTML(this.value, "fovValue");
+    });
+
+    //
+    // CAMERA CONTROL EVENTS
     //
 
     canvas.addEventListener("mousedown", () => {
         gClicked = true;
-    })
+    });
 
     canvas.addEventListener("mouseup", () => {
         gClicked = false;
-    })
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+        gClicked = false;
+    });
 
     canvas.addEventListener("mousemove", (event) => {
-        if(!gClicked) return;
+        if (!gClicked) return;
 
-        //update angles
-        gGlobalRotation -= event.movementX * 0.75;
-        gViewingAngle += event.movementY  * 0.75;
+        camera.panLeft(event.movementX * 0.1);
+    });
 
-    })
-    return;
+    window.addEventListener("keydown", (e) => {
+        keys[e.key] = true;
+    });
+
+    window.addEventListener("keyup", (e) => {
+        keys[e.key] = false;
+    });
 }
 
 function main(){
     //setup webgl
     setupWebGL();
 
-    //create renderer
-    const render = new Renderer(gl);
+    const camera = new Camera();
+    const render = new Renderer(gl, camera);
     const textureManager = new TextureManager(gl);
 
     //create scene
     const scene = new SceneManager(render, textureManager);
 
     //hookup html inputs
-    addHTMLActions(scene);
+    addHTMLActions(camera);
 
     let lastFpsTime = 0;
     let frameCount = 0;
     let fps = 0;
     function tick() {
         const frameStart = performance.now();
+
+        if (keys['w']) camera.moveForward();
+        if (keys['s']) camera.moveBackward();
+        if (keys['a']) camera.moveLeft();
+        if (keys['d']) camera.moveRight();
+        if (keys['ArrowLeft']) camera.panLeft();
+        if (keys['ArrowRight']) camera.panRight();
 
         scene.renderScene();
 
