@@ -22,10 +22,6 @@ function setupWebGL(){
     }
 }
 
-function handleMouseMove(dx, dy) {
-    
-}
-
 function addHTMLActions(camera){
     //
     // SLIDER EVENTS
@@ -80,11 +76,11 @@ function main(){
     let frameCount = 0;
     let fps = 0;
 
-    function tick() {
-        const now = performance.now();
+    function tick(time) {
 
-        const deltaTime = (now - lastFrameTime) / 1000;
-        lastFrameTime = now;
+        //used for fps independent controls
+        const deltaTime = (time - lastFrameTime) / 1000;
+        lastFrameTime = time;
 
         //keyboard control
         if (keys['w']) camera.moveForward(deltaTime);
@@ -101,10 +97,10 @@ function main(){
 
         //fps counter
         frameCount++;
-        if (now - lastFpsTime >= 1000) {
+        if (time - lastFpsTime >= 1000) {
             fps = frameCount;
             frameCount = 0;
-            lastFpsTime = now;
+            lastFpsTime = time;
         }
 
         sendTextToHTML(
@@ -114,11 +110,11 @@ function main(){
 
         requestAnimationFrame(tick);
     }
-    tick();
+    requestAnimationFrame(tick);
 }
 
 function sendTextToHTML(text, htmlID){
-    var htmlElem = document.getElementById(htmlID);
+    let htmlElem = document.getElementById(htmlID);
     if(!htmlElem){
         console.log("Failed to get " + elemID + " from HTML!");
         return;

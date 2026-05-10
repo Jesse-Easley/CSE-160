@@ -2,7 +2,7 @@ class SceneObject{
     constructor(mesh = null, material = null){
         this.localMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
-        
+
         this.mesh = mesh;
 
         this.material = material;
@@ -45,5 +45,10 @@ class SceneObject{
     addChild(child){
         child.parent = this;
         this.children.push(child);
+    }
+
+    removeChild(child){
+        child.parent = null;
+        this.children.pop(child);
     }
 }

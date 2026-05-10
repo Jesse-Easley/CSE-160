@@ -7,32 +7,7 @@ class SceneManager{
 
         this.batches = [];
 
-        //hardcoded for testing purposes
-        const cubeMesh = generateCubeMesh(gl);
-        cubeMesh.createBuffers();
-        cubeMesh.uploadBuffers();
-        
-
-        const skyMat = new Material;
-        skyMat.textures.diffuse = this.textureManager.load("../resources/sky.jpg", "diffuse");
-
-        const groundMat = new Material();
-        groundMat.textures.diffuse = this.textureManager.load("../resources/ground_texture.png", "diffuse");
-
         this.generateLevel();
-
-        let skybox = new SceneObject(cubeMesh, skyMat);
-        this.root.addChild(skybox);
-        skybox.material.texColorWeight = 0.0;
-        skybox.material.color = [0.3, 0.4, 0.8, 1.0];
-        skybox.scale(100,100,100);
-        skybox.isStatic = true;
-
-        let ground = new SceneObject(cubeMesh, groundMat);
-        this.root.addChild(ground);
-        ground.translate(0, 0.45, 0);
-        ground.scale(32, 0.1, 32);
-        ground.isStatic = true;
 
         this.batchStatics();
     }
@@ -166,6 +141,9 @@ class SceneManager{
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
@@ -177,10 +155,7 @@ class SceneManager{
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
             [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
@@ -197,13 +172,39 @@ class SceneManager{
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
         ];
 
-        const wallMat = new Material();
-        wallMat.textures.diffuse = this.textureManager.load("../resources/marble_cliff_01_diff_1k.png");;
-        wallMat.textures.ao = this.textureManager.load("../resources/marble_cliff_01_ao_1k.png");;
+        //generate cube mesh
+        const cubeMesh = generateCubeMesh(gl);
+        const skyboxMesh = generateSkyboxCubeMesh(gl);
+        cubeMesh.createBuffers();
+        cubeMesh.uploadBuffers();
 
+        //create sky and ground mats
+        const skyMat = new Material;
+        skyMat.textures.diffuse = this.textureManager.load("../resources/sky.jpg", "diffuse");
+        const groundMat = new Material();
+        groundMat.textures.diffuse = this.textureManager.load("../resources/ground_texture.png", "diffuse");
+
+        //setup sky and ground cubes
+        let skybox = new SceneObject(skyboxMesh, skyMat);
+        this.root.addChild(skybox);
+        skybox.material.texColorWeight = 0.0;
+        skybox.material.color = [0.3, 0.4, 0.8, 1.0];
+        skybox.scale(100,100,100);
+        skybox.isStatic = true;
+
+        let ground = new SceneObject(cubeMesh, groundMat);
+        this.root.addChild(ground);
+        ground.translate(0.5, 0.45, 0.5);
+        ground.scale(32, 0.1, 32);
+        // ground.isStatic = true;
+
+        //material for the walls
+        const wallMat = new Material();
+        wallMat.textures.diffuse = this.textureManager.load("../resources/rock_wall_16_diff_1k.png");
+        wallMat.textures.ao = this.textureManager.load("../resources/rock_wall_16_ao_1k.png");
         const wallMesh = generateCubeMesh(gl);
 
-        //iterate through array and place
+        //iterate through array and place blocks
         for(let row = 0; row < lvlArray.length; row++){
             for(let col = 0; col < lvlArray[row].length; col++){
                 for(let i = 0; i < lvlArray[row][col]; i++){
@@ -211,7 +212,7 @@ class SceneManager{
 
                     let worldCol = 16 - col;
                     let worldRow = 16 - row;
-                    
+
                     obj.translate(worldCol,i+1,worldRow);
 
                     obj.mesh = wallMesh;

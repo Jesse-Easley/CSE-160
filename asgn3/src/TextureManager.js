@@ -13,13 +13,13 @@ class TextureManager {
         }
 
         const gl = this.gl;
-        var texture = gl.createTexture();
+        let texture = gl.createTexture();
         texture.id = this.nextTexID++;
 
         //put it in the cache
         this.cache.set(path, texture);
 
-        var image = new Image();
+        let image = new Image();
         image.onload = () => {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 

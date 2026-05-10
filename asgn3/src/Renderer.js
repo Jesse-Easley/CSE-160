@@ -1,4 +1,4 @@
-var VSHADER_SOURCE = 
+let VSHADER_SOURCE = 
     `attribute vec4 a_Position;
      uniform mat4 u_ModelMatrix;
      uniform mat4 u_ViewMatrix;
@@ -17,7 +17,7 @@ var VSHADER_SOURCE =
         v_Normal = a_Normal;
      }`;
 
-var FSHADER_SOURCE = 
+let FSHADER_SOURCE = 
     `precision mediump float;
 
      uniform vec4 u_FragColor;
@@ -53,6 +53,7 @@ class Renderer{
 
     initGLState(){
         this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.enable(this.gl.CULL_FACE);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     }
 
@@ -127,7 +128,7 @@ class Renderer{
         mesh.bind(gl);
 
         //assign and enable buffer attributes
-        var FSIZE = mesh.vertices.BYTES_PER_ELEMENT;
+        let  FSIZE = mesh.vertices.BYTES_PER_ELEMENT;
         gl.vertexAttribPointer(this.a_Position, 3, gl.FLOAT, false, FSIZE * 8, 0);
         gl.enableVertexAttribArray(this.a_Position);
 
