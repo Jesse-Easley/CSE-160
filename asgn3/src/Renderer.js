@@ -60,59 +60,24 @@ class Renderer{
     initShaderVariables(){
         const gl = this.gl;
 
+        this.uniformLocations = {};
+
         //gets storage location of a_Position
         this.a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-        if (this.a_Position == -1) {
-            console.log('Failed to get the storage location of a_Position');
-            return;
-        }
-
-        //gets storage location of u_ModelMatrix
         this.u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
-        if(this.u_ModelMatrix == -1){
-            console.log('Failed to get storage location of u_ModelMatrix');
-            return;
-        }
-
-        //gets storage location of u_ModelMatrix
         this.u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-        if(this.u_ViewMatrix == -1){
-            console.log('Failed to get storage location of u_ViewMatrix');
-            return;
-        }
-
-        //gets storage location of u_ProjectionMatrix
         this.u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
-        if(this.u_ProjectionMatrix == -1){
-            console.log('Failed to get storage location of u_ProjectionMatrix');
-            return;
-        }
-
-        //gets storage location of a_UV
         this.a_UV = gl.getAttribLocation(gl.program, 'a_UV');
-        if(this.a_UV == -1){
-            console.log('Failed to get storage location of a_UV!');
-            return;
-        }
-        
-        //gets storage location of u_FragColor
         this.u_texColorWeight = gl.getUniformLocation(gl.program, 'u_texColorWeight');
-        if(this.u_texColorWeight == -1){
-            console.log('Failed to get storage location of u_texColorWeight');
-            return;
-        }
-
-        //gets storage location of a_FragColor
         this.u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
-        if(this.u_FragColor == -1){
-            console.log('Failed to get storage location of a_FragColor!');
-            return;
-        }
-
         this.a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
-        if(this.a_Normal == -1){
-            console.log('Failed to get storage location of a_Normal!');
-            return;
+
+        const samplerNames = ["diffuse", "ao"];
+
+        for (const name of samplerNames) {
+            const uniformName = `u_${name}`;
+            this.uniformLocations[uniformName] =
+                gl.getUniformLocation(gl.program, uniformName);
         }
     }
 
@@ -147,8 +112,8 @@ class Renderer{
             gl.activeTexture(gl.TEXTURE0 + unit);
             gl.bindTexture(gl.TEXTURE_2D, texture);
 
-            const loc = gl.getUniformLocation(gl.program, `u_${name}`);
-            gl.uniform1i(loc, unit);
+            const loc = this.uniformLocations[`u_${name}`];
+            if (loc) gl.uniform1i(loc, unit);
         }
 
         gl.uniform1f(this.u_texColorWeight, object.material.texColorWeight);

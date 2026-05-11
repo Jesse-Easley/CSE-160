@@ -90,6 +90,7 @@ function main(){
         if (keys['q']) camera.panLeft();
         if (keys['e']) camera.panRight();
 
+
         //time to render
         const renderStart = performance.now();
         scene.renderScene();

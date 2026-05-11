@@ -2,11 +2,11 @@ class SceneObject{
     constructor(mesh = null, material = null){
         this.localMatrix = new Matrix4();
         this.worldMatrix = new Matrix4();
-
-        this.mesh = mesh;
+        this.areTransformsDirty = true;
 
         this.material = material;
 
+        this.mesh = mesh;
         this.isStatic = false;
         this.isBatched = false;
 
@@ -14,29 +14,50 @@ class SceneObject{
         this.children = [];
     }
 
-    //added these so I wouldn't need to write ".localMatrix" every time
+    //needed to wrap the 
     rotate(angle, x, y, z){
         this.localMatrix.rotate(angle, x, y, z);
+        this.markDirty();
     }
 
     translate(x, y, z){
         this.localMatrix.translate(x, y, z);
+        this.markDirty();
     }
 
     scale(x, y, z){
         this.localMatrix.scale(x, y, z);
+        this.markDirty();
+    }
+
+    markDirty() {
+        if (this.isStatic) return;
+
+        if (!this.areTransformsDirty) {
+            this.areTransformsDirty = true;
+
+            // children depend on this transform, so they must update too
+            for (let child of this.children) {
+                child.markDirty();
+            }
+        }
     }
 
     //world matrix contains final world transform for the object after updateWorldMatrix
     updateWorldMatrix(parentWorldMatrix){
-        if(parentWorldMatrix){
-            this.worldMatrix.set(parentWorldMatrix);
-            this.worldMatrix.multiply(this.localMatrix);
-        }
-        else{
-            this.worldMatrix.set(this.localMatrix);
+        //only update if needed
+        if (this.areTransformsDirty) {
+            if (parentWorldMatrix) {
+                this.worldMatrix.set(parentWorldMatrix);
+                this.worldMatrix.multiply(this.localMatrix);
+            } else {
+                this.worldMatrix.set(this.localMatrix);
+            }
+
+            this.areTransformsDirty = false;
         }
 
+        //still need to update children
         for(let child of this.children){
             child.updateWorldMatrix(this.worldMatrix);
         }
@@ -48,7 +69,16 @@ class SceneObject{
     }
 
     removeChild(child){
-        child.parent = null;
-        this.children.pop(child);
+        const index = this.children.indexOf(child);
+        if (index !== -1) {
+            this.children.splice(index, 1);
+            child.parent = null;
+        }
+    }
+
+    destroy() {
+        if (this.parent) {
+            this.parent.removeChild(this);
+        }
     }
 }
