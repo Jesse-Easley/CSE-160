@@ -2,6 +2,9 @@
 let canvas;
 let gl;
 
+let hud;
+let hudCtx;
+
 let gGlobalRotation = 0;
 let gViewingAngle = 0;
 
@@ -9,10 +12,21 @@ let gClicked = false;
 
 let keys = {};
 
+const GameState = {
+    PLAYING: "playing",
+    GAME_OVER: "game_over"
+}
+
+let gameState = GameState.PLAYING;
+
 //sets up webgl contex
 function setupWebGL(){
     //get canvas element
     canvas = document.getElementById('webgl');
+
+    //get canvas an
+    hudCanvas = document.getElementById('hud');
+    hudCtx = hudCanvas.getContext('2d');
 
     //gets rendering context for WebGL
     gl = getWebGLContext(canvas, {preserveDrawingBuffer: true});
@@ -66,21 +80,64 @@ function main(){
     const textureManager = new TextureManager(gl);
 
     //create scene
-    const scene = new SceneManager(render, textureManager);
+    const scene = new SceneManager(render, camera, textureManager);
 
     //hookup html inputs
     addHTMLActions(camera);
 
+    //define hud font/color
+    hudCtx.font = "18px Arial";
+    hudCtx.fillStyle = 'rgba(255,255,255,1)';
+
+    //define vars for gameloop
+    let isGameOver = false;
+
+    function tick(time){
+        switch(gameState){
+            case GameState.PLAYING:
+                updatePlaying(time);
+                break;
+            case GameState.GAME_OVER:
+                updateGameOver();
+                break;
+        }
+
+        requestAnimationFrame(tick);
+    }
+
+    //define variables for timekeeping and measuring fps
+    let timer = 5000; //seconds
     let lastFrameTime = performance.now();
     let lastFpsTime = lastFrameTime;
     let frameCount = 0;
     let fps = 0;
 
-    function tick(time) {
-
+    function updatePlaying(time){
         //used for fps independent controls
-        const deltaTime = (time - lastFrameTime) / 1000;
+        const deltaTime = (time - lastFrameTime) / 1000; //in seconds
         lastFrameTime = time;
+
+        //update timer
+        timer -= deltaTime;
+        timer = Math.max(timer, 0);
+
+        let minutes = timer / 60 - 1;
+        minutes = Math.max(minutes, 0);
+        let seconds = timer % 60;
+
+        //print hud text
+        hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+        const text = "Find the exit in time!";
+
+        let mids = findTextMiddle(text);
+
+        hudCtx.fillText("Find the exit in time!", mids[0], 30);
+        hudCtx.fillText(`Time remaining: ${minutes.toFixed(0)}:${seconds.toFixed(1)}`, 10, 30);
+
+        if(timer <= 0){
+            gameState = GameState.GAME_OVER;
+            return;
+        }
 
         //keyboard control
         if (keys['w']) camera.moveForward(deltaTime);
@@ -108,9 +165,29 @@ function main(){
             `render: ${renderTime.toFixed(2)} ms | fps: ${fps}`,
             "fps"
         );
-
-        requestAnimationFrame(tick);
     }
+
+    function updateGameOver(){
+        //print game over screen
+        let GameOverText = "GAME OVER!";
+        let GOMids = findTextMiddle(GameOverText);
+
+        let RestartText = "Press R to restart.";
+        let RMids = findTextMiddle(RestartText);
+
+        hudCtx.fillText(GameOverText, GOMids[0], GOMids[1] - 10);
+        hudCtx.fillText(RestartText, RMids[0], RMids[1] + 10);
+
+        //reset scene after pressing r
+        if(keys['r']){
+            gameState = GameState.PLAYING;
+            timer = 10;
+            camera.reset();
+        }
+
+        return;
+    }
+        
     requestAnimationFrame(tick);
 }
 
@@ -122,4 +199,14 @@ function sendTextToHTML(text, htmlID){
     }
 
     htmlElem.innerHTML = text;
+}
+
+function findTextMiddle(text){
+    const metrics = hudCtx.measureText(text);
+    const textWidth = metrics.width;
+
+    const x = (hudCanvas.width / 2) - (textWidth / 2);
+    const y = (hudCanvas.height / 2) + (18 / 2);
+
+    return [x,y];
 }

@@ -1,8 +1,9 @@
 class SceneManager{
-    constructor(renderer, textureManager){
+    constructor(renderer, camera, textureManager){
         //creates root from which all other objects inherit transforms
         this.root = new SceneObject();
         this.renderer = renderer;
+        this.camera = camera;
         this.textureManager = textureManager;
 
         this.batches = [];
@@ -138,46 +139,12 @@ class SceneManager{
     }
 
     generateLevel(){
-        // this.lvlArray = [
-        //     [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 4, 4, 4, 4, 0, 0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 0, 0, 4, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 4, 0, 4, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 4, 0, 4, 0, 0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 0, 0, 4, 4, 4, 4, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 0, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        //     [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
-        // ];
+        //create the maze array;
+        const maze = generateMaze(33, 33);
+        // placeIco(maze);
+        this.lvlArray = mazeToLevelArray(maze);
 
         //generate cube mesh
-        
-        const maze = generateMaze(33, 33);
-        this.lvlArray = mazeToLevelArray(maze);
-        
         const cubeMesh = generateCubeMesh(gl);
         const skyboxMesh = generateSkyboxCubeMesh(gl);
         cubeMesh.createBuffers();
@@ -212,11 +179,26 @@ class SceneManager{
         //iterate through array and place blocks
         for(let row = 0; row < this.lvlArray.length; row++){
             for(let col = 0; col < this.lvlArray[row].length; col++){
+                let worldCol = col - 16;
+                let worldRow = row - 16;
+                
+                //place icosahedron if -1
+                if(this.lvlArray[row][col] == -1){
+                    let icoMat = new Material();
+                    let icoMesh = generateIco(gl);
+                    icoMesh.createBuffers();
+                    icoMesh.uploadBuffers();
+
+                    let ico = new SceneObject(icoMesh, icoMat);
+
+                    ico.material.texColorWeight = 0.0;
+                    ico.material.color = [0.29, 0, 0.43, 1.0];
+                    this.root.addChild(ico);
+                    ico.translate(worldCol, 1.5, worldRow);
+                }
+                
                 for(let i = 0; i < this.lvlArray[row][col]; i++){
                     let obj = new SceneObject();
-
-                    let worldCol = col - 16;
-                    let worldRow = row - 16;
 
                     obj.translate(worldCol, i+1 ,worldRow);
 
@@ -228,32 +210,6 @@ class SceneManager{
                 }
             }
         }
-
-        // //add some unbatched boxes
-        // for (let i = 0; i < 2; i++) {
-        //     const cube = new SceneObject(cubeMesh, wallMat);
-
-        //     // random position
-        //     cube.translate(
-        //         Math.random() * 20 - 10,
-        //         Math.random() * 10,
-        //         Math.random() * 20 - 10
-        //     );
-
-        //     // random rotation
-        //     cube.rotate(
-        //         Math.random() * 360,
-        //         Math.random(),
-        //         Math.random(),
-        //         Math.random()
-        //     );
-
-        //     // random scale
-        //     const s = Math.random() * 0.5 + 0.2;
-        //     cube.scale(s, s, s);
-
-        //     this.root.addChild(cube);
-        // }
     }
 }
 
@@ -271,6 +227,7 @@ function generateMaze(width, height) {
         [-1, 0]
     ];
 
+    //get random direction
     function shuffle(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -307,11 +264,10 @@ function mazeToLevelArray(maze) {
     );
 }
 
-//finds open space in lower left of maze for player to start
-function findOpenCell(maze) {
+function placeIco(maze) {
     while (true) {
-        const x = Math.floor(Math.random() * 5);
-        const y = Math.floor(Math.random() * 5);
-        if (maze[y][x] === 0) return { x, y };
+        const x = Math.floor(Math.random() * 33);
+        const y = Math.floor(Math.random() * 33);
+        if (maze[y][x] === 0) maze[y][x] = -1;
     }
 }

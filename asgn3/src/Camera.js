@@ -2,8 +2,9 @@ class Camera{
     constructor(){
         this.fov = 90.0;
 
-        this.eye = new Vector3([0,2,0]);
-        this.at = new Vector3([0,0,-1]);
+        //start the camera at worldpos (0, 0) looking towards positive z
+        this.eye = new Vector3([-15,2,-15]);
+        this.at = new Vector3([-15,2,-14]);
         this.up = new Vector3([0,1,0]);
 
         this.viewMatrix = new Matrix4();
@@ -17,6 +18,13 @@ class Camera{
     
         this.moveSpeed = 15.0;
         this.alpha = 2;
+    }
+
+    reset(){
+        this.eye = new Vector3([-15,2,-15]);
+        this.at = new Vector3([-15,2,-14]);
+        this.up = new Vector3([0,1,0]);
+        this.updateView();
     }
 
     moveForward(deltaTime = 1){

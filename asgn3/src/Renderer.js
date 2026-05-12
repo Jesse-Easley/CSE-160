@@ -76,8 +76,7 @@ class Renderer{
 
         for (const name of samplerNames) {
             const uniformName = `u_${name}`;
-            this.uniformLocations[uniformName] =
-                gl.getUniformLocation(gl.program, uniformName);
+            this.uniformLocations[uniformName] = gl.getUniformLocation(gl.program, uniformName);
         }
     }
 
