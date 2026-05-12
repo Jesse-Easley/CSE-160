@@ -141,7 +141,7 @@ class SceneManager{
     generateLevel(){
         //create the maze array;
         const maze = generateMaze(33, 33);
-        // placeIco(maze);
+        placeIco(maze);
         this.lvlArray = mazeToLevelArray(maze);
 
         //generate cube mesh
@@ -185,6 +185,7 @@ class SceneManager{
                 //place icosahedron if -1
                 if(this.lvlArray[row][col] == -1){
                     let icoMat = new Material();
+
                     let icoMesh = generateIco(gl);
                     icoMesh.createBuffers();
                     icoMesh.uploadBuffers();
@@ -193,6 +194,7 @@ class SceneManager{
 
                     ico.material.texColorWeight = 0.0;
                     ico.material.color = [0.29, 0, 0.43, 1.0];
+
                     this.root.addChild(ico);
                     ico.translate(worldCol, 1.5, worldRow);
                 }
@@ -260,7 +262,11 @@ function generateMaze(width, height) {
 
 function mazeToLevelArray(maze) {
     return maze.map(row =>
-        row.map(cell => (cell === 1 ? 4 : 0))
+        row.map(cell => {
+            if (cell === 1) return 4;   // wall height
+            if (cell === -1) return -1; // ico marker
+            return 0;                   // path
+        })
     );
 }
 
@@ -268,6 +274,10 @@ function placeIco(maze) {
     while (true) {
         const x = Math.floor(Math.random() * 33);
         const y = Math.floor(Math.random() * 33);
-        if (maze[y][x] === 0) maze[y][x] = -1;
+        if (maze[y][x] === 0){
+            console.log("Ico: ", x, y)
+            maze[y][x] = -1;
+            break;
+        }
     }
 }
