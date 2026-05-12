@@ -106,7 +106,8 @@ function main(){
     }
 
     //define variables for timekeeping and measuring fps
-    let timer = 5000; //seconds
+    let timerMax = 10;
+    let timer = timerMax; //seconds
     let lastFrameTime = performance.now();
     let lastFpsTime = lastFrameTime;
     let frameCount = 0;
@@ -127,11 +128,11 @@ function main(){
 
         //print hud text
         hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
-        const text = "Find the exit in time!";
+        const text = "Find the icosahedron in time!";
 
         let mids = findTextMiddle(text);
 
-        hudCtx.fillText("Find the exit in time!", mids[0], 30);
+        hudCtx.fillText(text, mids[0], 550);
         hudCtx.fillText(`Time remaining: ${minutes.toFixed(0)}:${seconds.toFixed(1)}`, 10, 30);
 
         if(timer <= 0){
@@ -181,8 +182,10 @@ function main(){
         //reset scene after pressing r
         if(keys['r']){
             gameState = GameState.PLAYING;
-            timer = 10;
+            timer = timerMax;
             camera.reset();
+
+            // scene.reset();
         }
 
         return;

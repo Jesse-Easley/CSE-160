@@ -138,6 +138,14 @@ class SceneManager{
         }
     }
 
+    // reset(){
+    //     for(let child of this.root.children){
+    //         child.destroy();
+    //     }
+
+    //     this.generateLevel();
+    // }
+
     generateLevel(){
         //create the maze array;
         const maze = generateMaze(33, 33);
@@ -275,7 +283,6 @@ function placeIco(maze) {
         const x = Math.floor(Math.random() * 33);
         const y = Math.floor(Math.random() * 33);
         if (maze[y][x] === 0){
-            console.log("Ico: ", x, y)
             maze[y][x] = -1;
             break;
         }
