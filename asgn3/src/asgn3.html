@@ -26,7 +26,7 @@
     <div style="display: flex; gap: 20px; margin: 0px;"> 
         <div id="canvasContainer" style="position: relative; width: 600px; height: 600px;">
             <canvas id="webgl" width="600px" height="600px" style="display: block; position:absolute; z-index: 0;">Canvas not loaded!</canvas>
-            <canvas id="hud" width="600px" height="600px" style="display: block; position:absolute; z-index: 1; pointer-events: none;">Canvas not loaded!</canvas>
+            <canvas id="hud" width="600px" height="600px" style="display: block; position:absolute; z-index: 1; pointer-events: none;">Hud not loaded!</canvas>
         </div>
         <div>
             <div>Jesse Easley</div>
@@ -40,6 +40,10 @@
         <label for="fovSlider">FOV: </label>
         <input type="range" id="fovSlider" min="30" max="120" value="60">
         <span id="fovValue">60</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="noClip">no clip: </label>
+        <input type="checkbox" id="noClip">
     </div>
 </body>
 </html>

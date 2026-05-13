@@ -53,7 +53,7 @@ class Renderer{
 
     initGLState(){
         this.gl.enable(this.gl.DEPTH_TEST);
-        this.gl.enable(this.gl.CULL_FACE);
+        // this.gl.enable(this.gl.CULL_FACE);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     }
 

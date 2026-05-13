@@ -127,6 +127,14 @@ class SceneManager{
         return new Mesh(gl, new Float32Array(mergedVertices), new Uint16Array(mergedIndices));
     }
 
+    rebatch() {
+        //clears existing batches
+        this.batches = [];
+        
+        //redo batching on current scene graph
+        this.batchStatics();
+    }
+
     renderSceneGraph(object){
         //if not an empty SceneObject, draw it
         if(object.mesh && !object.isBatched){
@@ -138,14 +146,15 @@ class SceneManager{
         }
     }
 
-    // reset(){
-    //     for(let child of this.root.children){
-    //         child.destroy();
-    //     }
+    //when the user reaches an end state
+    reset() {
+        this.batches = [];
+        this.root = new SceneObject();
+        this.generateLevel();
+        this.batchStatics();
+    }
 
-    //     this.generateLevel();
-    // }
-
+    //creates maze and places goal
     generateLevel(){
         //create the maze array;
         const maze = generateMaze(33, 33);
@@ -179,10 +188,10 @@ class SceneManager{
         ground.isStatic = true;
 
         //material for the walls
-        const wallMat = new Material();
-        wallMat.textures.diffuse = this.textureManager.load("../resources/rock_wall_16_diff_1k.png");
-        wallMat.textures.ao = this.textureManager.load("../resources/rock_wall_16_ao_1k.png");
-        const wallMesh = generateCubeMesh(gl);
+        this.wallMat = new Material();
+        this.wallMat.textures.diffuse = this.textureManager.load("../resources/rock_wall_16_diff_1k.png");
+        this.wallMat.textures.ao = this.textureManager.load("../resources/rock_wall_16_ao_1k.png");
+        this.wallMesh = generateCubeMesh(gl);
 
         //iterate through array and place blocks
         for(let row = 0; row < this.lvlArray.length; row++){
@@ -205,6 +214,8 @@ class SceneManager{
 
                     this.root.addChild(ico);
                     ico.translate(worldCol, 1.5, worldRow);
+                    ico.scale(0.25, 0.25, 0.25);
+                    console.log(row, col);
                 }
                 
                 for(let i = 0; i < this.lvlArray[row][col]; i++){
@@ -212,8 +223,8 @@ class SceneManager{
 
                     obj.translate(worldCol, i+1 ,worldRow);
 
-                    obj.mesh = wallMesh;
-                    obj.material = wallMat;
+                    obj.mesh = this.wallMesh;
+                    obj.material = this.wallMat;
                     obj.isStatic = true;
 
                     this.root.addChild(obj);
@@ -237,7 +248,7 @@ function generateMaze(width, height) {
         [-1, 0]
     ];
 
-    //get random direction
+    //shuffle directions
     function shuffle(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));

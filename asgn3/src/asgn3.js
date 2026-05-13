@@ -14,7 +14,8 @@ let keys = {};
 
 const GameState = {
     PLAYING: "playing",
-    GAME_OVER: "game_over"
+    GAME_OVER: "game_over",
+    GAME_WIN: "game_win"
 }
 
 let gameState = GameState.PLAYING;
@@ -24,7 +25,7 @@ function setupWebGL(){
     //get canvas element
     canvas = document.getElementById('webgl');
 
-    //get canvas an
+    //get hud
     hudCanvas = document.getElementById('hud');
     hudCtx = hudCanvas.getContext('2d');
 
@@ -38,11 +39,21 @@ function setupWebGL(){
 
 function addHTMLActions(camera){
     //
-    // SLIDER EVENTS
+    // HTML EVENTS
     //
     document.getElementById("fovSlider").addEventListener("input", function() {
         camera.setFov(this.value);
         sendTextToHTML(this.value, "fovValue");
+    });
+
+    document.getElementById("noClip").addEventListener("change", function() {
+        if (event.target.checked) {
+            camera.noclip = true;
+
+        }
+        else {
+            camera.noclip = false;
+        }
     });
 
     //
@@ -81,6 +92,7 @@ function main(){
 
     //create scene
     const scene = new SceneManager(render, camera, textureManager);
+    camera.setScene(scene);
 
     //hookup html inputs
     addHTMLActions(camera);
@@ -100,13 +112,16 @@ function main(){
             case GameState.GAME_OVER:
                 updateGameOver();
                 break;
+            case GameState.GAME_WIN:
+                updateGameWin();
+                break;
         }
 
         requestAnimationFrame(tick);
     }
 
     //define variables for timekeeping and measuring fps
-    let timerMax = 10;
+    let timerMax = 120;
     let timer = timerMax; //seconds
     let lastFrameTime = performance.now();
     let lastFpsTime = lastFrameTime;
@@ -122,7 +137,7 @@ function main(){
         timer -= deltaTime;
         timer = Math.max(timer, 0);
 
-        let minutes = timer / 60 - 1;
+        let minutes = Math.floor(timer / 60);
         minutes = Math.max(minutes, 0);
         let seconds = timer % 60;
 
@@ -148,6 +163,19 @@ function main(){
         if (keys['q']) camera.panLeft();
         if (keys['e']) camera.panRight();
 
+        //get camera pos
+        let cameraX = parseInt(camera.eye.elements[0]);
+        let cameraZ = parseInt(camera.eye.elements[2]);
+
+        //if player finds the icosahedron
+        const row = cameraZ + 16;
+        const col = cameraX + 16;
+        if (row >= 0 && row < scene.lvlArray.length && col >= 0 && col < scene.lvlArray[row].length) {
+            if (scene.lvlArray[row][col] === -1) {
+                gameState = GameState.GAME_WIN;
+                return;
+            }
+        }
 
         //time to render
         const renderStart = performance.now();
@@ -169,6 +197,7 @@ function main(){
     }
 
     function updateGameOver(){
+        hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
         //print game over screen
         let GameOverText = "GAME OVER!";
         let GOMids = findTextMiddle(GameOverText);
@@ -183,9 +212,33 @@ function main(){
         if(keys['r']){
             gameState = GameState.PLAYING;
             timer = timerMax;
-            camera.reset();
 
-            // scene.reset();
+            camera.reset();
+            scene.reset();
+        }
+
+        return;
+    }
+
+    function updateGameWin(){
+        hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+        //print game over screen
+        let GameWinText = "You Win!";
+        let GWMids = findTextMiddle(GameWinText);
+
+        let RestartText = "Press R to play again.";
+        let RMids = findTextMiddle(RestartText);
+
+        hudCtx.fillText(GameWinText, GWMids[0], GWMids[1] - 10);
+        hudCtx.fillText(RestartText, RMids[0], RMids[1] + 10);
+
+        //reset scene after pressing r
+        if(keys['r']){
+            gameState = GameState.PLAYING;
+            timer = timerMax;
+
+            camera.reset();
+            scene.reset();
         }
 
         return;
@@ -204,6 +257,7 @@ function sendTextToHTML(text, htmlID){
     htmlElem.innerHTML = text;
 }
 
+//used to center text on screen
 function findTextMiddle(text){
     const metrics = hudCtx.measureText(text);
     const textWidth = metrics.width;

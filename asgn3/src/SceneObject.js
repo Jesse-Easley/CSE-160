@@ -76,9 +76,12 @@ class SceneObject{
         }
     }
 
-    destroy() {
-        if (this.parent) {
-            this.parent.removeChild(this);
-        }
+    getWorldPosition() {
+        //extract translation from the world matrix (last column)
+        return [
+            this.worldMatrix.elements[12], //x
+            this.worldMatrix.elements[13], //y
+            this.worldMatrix.elements[14]  //z
+        ];
     }
 }

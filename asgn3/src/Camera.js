@@ -16,8 +16,14 @@ class Camera{
         this.projectionMatrix = new Matrix4();
         this.projectionMatrix.setPerspective(this.fov, canvas.width/canvas.height, 0.1, 1000);
     
-        this.moveSpeed = 15.0;
+        this.moveSpeed = 5.0;
         this.alpha = 2;
+
+        this.noclip = false
+    }
+
+    setScene(scene){
+        this.scene = scene;
     }
 
     reset(){
@@ -27,16 +33,37 @@ class Camera{
         this.updateView();
     }
 
+    //quick and dirty collision check (BAD!)
+    canMoveTo(x, z) {
+        if(this.noclip) return true;
+        
+        const row = Math.floor(z + 16.5);
+        const col = Math.floor(x + 16.5);
+        
+        if (row < 0 || row >= this.scene.lvlArray.length || 
+            col < 0 || col >= this.scene.lvlArray[row].length) {
+            return false;
+        }
+        
+        const cellValue = this.scene.lvlArray[row][col];
+        return cellValue === 0 || cellValue === -1;
+    }
+
     moveForward(deltaTime = 1){
         //forward vector
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
         //remove y component
-        f.set(new Vector3([f.elements[0], f.elements[1], f.elements[2]]));
+        f.set(new Vector3([f.elements[0], 0, f.elements[2]]));
 
         f.normalize();
         f.mul(this.moveSpeed * deltaTime);
+
+        if (!this.canMoveTo(this.eye.elements[0] + f.elements[0], 
+                            this.eye.elements[2] + f.elements[2], this.scene)) {
+            return;
+        }
 
         this.eye.add(f);
         this.at.add(f);
@@ -50,10 +77,15 @@ class Camera{
         b.set(this.eye).sub(this.at);
 
         //remove y component
-        b.set(new Vector3([b.elements[0], b.elements[1], b.elements[2]]));
+        b.set(new Vector3([b.elements[0], 0, b.elements[2]]));
 
         b.normalize();
         b.mul(this.moveSpeed * deltaTime);
+
+        if (!this.canMoveTo(this.eye.elements[0] + b.elements[0], 
+                            this.eye.elements[2] + b.elements[2], this.scene)) {
+            return;
+        }
 
         this.eye.add(b);
         this.at.add(b);
@@ -73,6 +105,11 @@ class Camera{
         s.normalize();
         s.mul(this.moveSpeed * deltaTime);
 
+        if (!this.canMoveTo(this.eye.elements[0] + s.elements[0], 
+                            this.eye.elements[2] + s.elements[2], this.scene)) {
+            return;
+        }
+
         this.eye.add(s);
         this.at.add(s);
 
@@ -83,13 +120,17 @@ class Camera{
         //forward vector
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
-
         
         //get right direction
         let s = Vector3.cross(f, this.up);
 
         s.normalize();
         s.mul(this.moveSpeed * deltaTime);
+
+        if (!this.canMoveTo(this.eye.elements[0] + s.elements[0], 
+                            this.eye.elements[2] + s.elements[2], this.scene)) {
+            return;
+        }
         
         this.eye.add(s);
         this.at.add(s);
@@ -166,7 +207,7 @@ class Camera{
 
         //prevent flipping upside down
         let newUp = Vector3.cross(right, f_prime);
-        if (newUp.elements[1] <= 0.01) return;  // simple clamp
+        if (newUp.elements[1] <= 0.01) return;  //simple clamp
 
         this.at.set(this.eye).add(f_prime);
         this.updateView();
