@@ -217,7 +217,7 @@ class SceneManager{
         let ground = new SceneObject(cubeMesh, groundMat);
         this.root.addChild(ground);
         ground.translate(0.5, 0.5, 0.5);
-        ground.scale(33, 0, 33);
+        ground.scale(33, 0.1, 33);
         ground.isStatic = true;
 
         //material for the walls
@@ -294,7 +294,7 @@ class SceneManager{
         let ground = new SceneObject(cubeMesh, groundMat);
         this.root.addChild(ground);
         ground.translate(0.5, 0.5, 0.5);
-        ground.scale(33, 0, 33);
+        ground.scale(33, 0.1, 33);
         ground.isStatic = true;
 
         //material for the walls
