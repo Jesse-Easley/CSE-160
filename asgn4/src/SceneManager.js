@@ -1,5 +1,5 @@
 class SceneManager{
-    constructor(renderer, camera, textureManager){
+    constructor(renderer, camera, textureManager, level){
         //creates root from which all other objects inherit transforms
         this.root = new SceneObject();
         this.renderer = renderer;
@@ -9,8 +9,7 @@ class SceneManager{
         this.batches = [];
         this.lvlArray = null;
 
-        this.generateLevel();
-
+        this.reset(level);
         this.batchStatics();
     }
 
@@ -147,11 +146,43 @@ class SceneManager{
     }
 
     //when the user reaches an end state
-    reset() {
+    reset(level) {
         this.batches = [];
         this.root = new SceneObject();
-        this.generateLevel();
+        this.createLights();
+        if(level == "maze") this.generateLevel();
+        else if(level == "sandbox") this.sandbox();
         this.batchStatics();
+    }
+
+    createLights(){
+        let lightMesh = generateCubeMesh(gl);
+        lightMesh.createBuffers();
+        lightMesh.uploadBuffers();
+        let lightMat = new Material();
+        let lightMat2 = new Material();
+
+        lightMat.texColorWeight = 0.0;
+        lightMat.color = [0.0, 0.0, 1.0, 1.0];
+        lightMat.kd = 1.0;
+        lightMat.ks = 0.0;
+        lightMat2.texColorWeight = 0.0;
+        lightMat2.color = [1.0, 0.0, 0.0, 1.0];
+        lightMat2.kd = 1.0;
+        lightMat2.ks = 0.0;
+
+        this.light = new SceneObject(lightMesh, lightMat);
+        this.light.isStatic = false;
+        this.spotlight = new SceneObject(lightMesh, lightMat2);
+        this.spotlight.isStatic = false;
+
+        this.light.localMatrix.setTranslate(gLightPos.elements[0], gLightPos.elements[1], gLightPos.elements[2]);
+        this.light.markDirty();
+        this.spotlight.localMatrix.setTranslate(gSpotPos.elements[0], gSpotPos.elements[1], gSpotPos.elements[2]);
+        this.light.markDirty();
+
+        this.root.addChild(this.light);
+        this.root.addChild(this.spotlight);
     }
 
     //creates maze and places goal
@@ -172,6 +203,8 @@ class SceneManager{
         skyMat.textures.diffuse = this.textureManager.load("../resources/sky.jpg", "diffuse");
         const groundMat = new Material();
         groundMat.textures.diffuse = this.textureManager.load("../resources/ground_texture.png", "diffuse");
+        skyMat.ks = 0.0;
+        groundMat.ks = 0.0;
 
         //setup sky and ground cubes
         let skybox = new SceneObject(skyboxMesh, skyMat);
@@ -189,6 +222,7 @@ class SceneManager{
 
         //material for the walls
         this.wallMat = new Material();
+        this.wallMat.ks = 0.0;
         this.wallMat.textures.diffuse = this.textureManager.load("../resources/rock_wall_16_diff_1k.png");
         this.wallMat.textures.ao = this.textureManager.load("../resources/rock_wall_16_ao_1k.png");
         this.wallMesh = generateCubeMesh(gl);
@@ -232,6 +266,110 @@ class SceneManager{
             }
         }
     }
+
+    sandbox(){
+        //generate cube mesh
+        const cubeMesh = generateCubeMesh(gl);
+        const skyboxMesh = generateSkyboxCubeMesh(gl);
+        cubeMesh.createBuffers();
+        cubeMesh.uploadBuffers();
+
+        //create sky and ground mats
+        const skyMat = new Material;
+        skyMat.textures.diffuse = this.textureManager.load("../resources/sky.jpg", "diffuse");
+        const groundMat = new Material();
+        groundMat.textures.diffuse = this.textureManager.load("../resources/ground_texture.png", "diffuse");
+        skyMat.ks = 0.0;
+        groundMat.ks = 0.0;
+
+        //setup sky and ground cubes
+        let skybox = new SceneObject(skyboxMesh, skyMat);
+        this.root.addChild(skybox);
+        skybox.material.texColorWeight = 0.0;
+        skybox.material.color = [0.3, 0.4, 0.8, 1.0];
+
+        skybox.scale(100,100,100);
+        skybox.isStatic = true;
+
+        let ground = new SceneObject(cubeMesh, groundMat);
+        this.root.addChild(ground);
+        ground.translate(0.5, 0.5, 0.5);
+        ground.scale(33, 0, 33);
+        ground.isStatic = true;
+
+        //material for the walls
+        this.wallMat = new Material();
+        this.wallMat.textures.diffuse = this.textureManager.load("../resources/rock_wall_16_diff_1k.png");
+        this.wallMat.textures.ao = this.textureManager.load("../resources/rock_wall_16_ao_1k.png");
+    
+        this.wallMat.ks = 0.0;
+        this.wallMesh = generateCubeMesh(gl);
+
+        this.lvlArray = generateBoxLevel(33, 33);
+
+        //place objects for lighting showcase
+        let genericMat = new Material();
+        genericMat.texColorWeight = 0.0;
+        genericMat.color = [0.29, 0, 0.43, 1.0];
+
+        let sphereMesh = generateSphere(0.5, 16, 16);
+        sphereMesh.createBuffers();
+        sphereMesh.uploadBuffers();
+
+        let sphere = new SceneObject(sphereMesh, genericMat);
+        this.root.addChild(sphere);
+        sphere.translate(0, 1.5, 3);
+
+        let cube = new SceneObject(cubeMesh, genericMat);
+        this.root.addChild(cube);
+        cube.translate(3, 1.5, -3);
+
+        let teapot = new SceneObject(gteapotMesh, genericMat);
+        teapot.translate(-3, 1.5, -3);
+        teapot.scale(0.5, 0.5, 0.5);
+        this.root.addChild(teapot);
+
+        //place wall blocks
+        for (let row = 0; row < this.lvlArray.length; row++) {
+            for (let col = 0; col < this.lvlArray[row].length; col++) {
+
+                let worldCol = col - 16;
+                let worldRow = row - 16;
+
+                //place wall blocks
+                for (let i = 0; i < this.lvlArray[row][col]; i++) {
+                    let obj = new SceneObject();
+
+                    obj.translate(worldCol, i + 1, worldRow);
+                    obj.mesh = this.wallMesh;
+                    obj.material = this.wallMat;
+                    obj.isStatic = true;
+
+                    this.root.addChild(obj);
+                }
+            }
+        }
+    }
+}
+
+function generateBoxLevel(width, height) {
+    const lvl = [];
+
+    for (let row = 0; row < height; row++) {
+        lvl[row] = [];
+        for (let col = 0; col < width; col++) {
+
+            //border walls
+            if (row === 0 || row === height - 1 ||
+                col === 0 || col === width - 1) {
+                lvl[row][col] = 4;   //wall height
+            } else {
+                lvl[row][col] = 0;   //empty
+            }
+        }
+    }
+
+    return lvl;
 }
 
 function generateMaze(width, height) {
@@ -282,9 +420,9 @@ function generateMaze(width, height) {
 function mazeToLevelArray(maze) {
     return maze.map(row =>
         row.map(cell => {
-            if (cell === 1) return 4;   // wall height
-            if (cell === -1) return -1; // ico marker
-            return 0;                   // path
+            if (cell === 1) return 4;   //wall height
+            if (cell === -1) return -1; //ico marker
+            return 0;                   //path
         })
     );
 }

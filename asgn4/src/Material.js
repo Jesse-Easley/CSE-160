@@ -33,8 +33,13 @@ class Material{
     constructor(){
         this.id = Material._id++;
 
-        this.color = [1.0, 0.0, 0.0, 1.0];
+        this.color = new Float32Array([1.0, 0.0, 0.0, 1.0]);
         this.texColorWeight = 1.0;
+
+        this.ka = 1.0;
+        this.kd = 1.0;
+        this.ks = 1.0;
+        this.shininess = 32.0;
 
         this.textures = {
             diffuse: null,

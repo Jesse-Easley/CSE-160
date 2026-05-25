@@ -26,9 +26,9 @@ class Camera{
         this.scene = scene;
     }
 
-    reset(){
-        this.eye = new Vector3([-15,2,-15]);
-        this.at = new Vector3([-15,2,-14]);
+    reset(eye = [-15,2,-15], at = [-15,2,-14]){
+        this.eye = new Vector3(eye);
+        this.at = new Vector3();
         this.up = new Vector3([0,1,0]);
         this.updateView();
     }
@@ -37,14 +37,25 @@ class Camera{
     canMoveTo(x, z) {
         if(this.noclip) return true;
         
+        if (!this.scene || !this.scene.lvlArray) {
+            return true;
+        }
+
         const row = Math.floor(z + 16.5);
         const col = Math.floor(x + 16.5);
-        
-        if (row < 0 || row >= this.scene.lvlArray.length || 
-            col < 0 || col >= this.scene.lvlArray[row].length) {
+ 
+        if (isNaN(row) || isNaN(col)) {
+            return false;
+        }
+
+        if (row < 0 || row >= this.scene.lvlArray.length) {
             return false;
         }
         
+        if (col < 0 || col >= this.scene.lvlArray[row].length) {
+            return false;
+        }
+
         const cellValue = this.scene.lvlArray[row][col];
         return cellValue === 0 || cellValue === -1;
     }
@@ -61,7 +72,7 @@ class Camera{
         f.mul(this.moveSpeed * deltaTime);
 
         if (!this.canMoveTo(this.eye.elements[0] + f.elements[0], 
-                            this.eye.elements[2] + f.elements[2], this.scene)) {
+                            this.eye.elements[2] + f.elements[2])) {
             return;
         }
 
@@ -83,7 +94,7 @@ class Camera{
         b.mul(this.moveSpeed * deltaTime);
 
         if (!this.canMoveTo(this.eye.elements[0] + b.elements[0], 
-                            this.eye.elements[2] + b.elements[2], this.scene)) {
+                            this.eye.elements[2] + b.elements[2])) {
             return;
         }
 
@@ -98,6 +109,9 @@ class Camera{
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
 
+        f.elements[1] = 0;
+        f.normalize();
+
         //get left direction
         let s = Vector3.cross(this.up, f);
 
@@ -106,7 +120,7 @@ class Camera{
         s.mul(this.moveSpeed * deltaTime);
 
         if (!this.canMoveTo(this.eye.elements[0] + s.elements[0], 
-                            this.eye.elements[2] + s.elements[2], this.scene)) {
+                            this.eye.elements[2] + s.elements[2])) {
             return;
         }
 
@@ -120,6 +134,9 @@ class Camera{
         //forward vector
         let f = new Vector3();
         f.set(this.at).sub(this.eye);
+
+        f.elements[1] = 0;
+        f.normalize();
         
         //get right direction
         let s = Vector3.cross(f, this.up);
@@ -128,7 +145,7 @@ class Camera{
         s.mul(this.moveSpeed * deltaTime);
 
         if (!this.canMoveTo(this.eye.elements[0] + s.elements[0], 
-                            this.eye.elements[2] + s.elements[2], this.scene)) {
+                            this.eye.elements[2] + s.elements[2])) {
             return;
         }
         
