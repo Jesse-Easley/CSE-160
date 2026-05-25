@@ -14,7 +14,7 @@ class Camera{
         );
 
         this.projectionMatrix = new Matrix4();
-        this.projectionMatrix.setPerspective(this.fov, canvas.width/canvas.height, 0.01, 1000);
+        this.projectionMatrix.setPerspective(this.fov, canvas.width/canvas.height, 0.1, 200);
     
         this.moveSpeed = 5.0;
         this.alpha = 2;
