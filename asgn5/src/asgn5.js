@@ -1,55 +1,56 @@
 import * as THREE from 'three';
+import * as SceneManager from './SceneManager.js';
+
+window.addEventListener("resize", windowResize);
+function windowResize(){
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+}
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+document.body.appendChild(renderer.domElement);
 
-const loader = new THREE.FileLoader();
-const [vShader, fShader] = await Promise.all([
-    loader.loadAsync('../shaders/VShader.glsl'),
-    loader.loadAsync('../shaders/FShader.glsl')
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// camera.position.z = 3;
+
+const loader = new THREE.CubeTextureLoader();
+const skybox = loader.load([
+    "../resources/textures/skybox/px.png",
+    "../resources/textures/skybox/nx.png",
+    "../resources/textures/skybox/py.png",
+    "../resources/textures/skybox/ny.png",
+    "../resources/textures/skybox/pz.png",
+    "../resources/textures/skybox/nz.png"
 ]);
+scene.background = skybox;
+scene.backgroundIntensity = 3;
 
-
-const outlineUniforms = {
-    thickness: { value: 0.05 },
-    outlineColor: { value: new THREE.Color(0xffffff) }
-};
-
-const shaderMat = new THREE.ShaderMaterial({
-    vertexShader: vShader,
-    fragmentShader: fShader,
-    uniforms: outlineUniforms,
-    side: THREE.BackSide
-});
-
-const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-const material = new THREE.MeshPhongMaterial({ color: 0xff2050 });
-const cube = new THREE.Mesh( geometry, shaderMat );
+const geometry = new THREE.SphereGeometry( 1, 32, 32 );
+const material = new THREE.MeshPhongMaterial( { color: 0xff1350 } );
+material.shininess = 300;
+const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
-const cube2 = new THREE.Mesh(geometry, material);
-scene.add( cube2 );
-cube2.position.y = 2;
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(5, 3, 2);
+scene.add(dirLight);
 
-const color = 0xFFFFFF;
-const intensity = 3;
-const light = new THREE.DirectionalLight(color, intensity);
-light.position.set(-1, 2, 4);
-scene.add(light);
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+dirLight2.position.set(-2, -4, -5);
+scene.add(dirLight2);
 
-camera.position.z = 5;
+const ambLight = new THREE.AmbientLight(0x404040, 1.0);
+scene.add(ambLight);
 
 function animate( time ) {
-    cube.rotation.x = time / 2000;
-    cube.rotation.y = time / 1000;
+    camera.position.x = Math.cos(time * 0.0005)*3;
+    camera.position.z = Math.sin(time * 0.0005)*3;
+    camera.lookAt(0, 0, 0);
 
-    cube2.rotation.x = time / 2000;
-    cube2.rotation.y = time / 1000;
-
-    renderer.render( scene, camera );
+    renderer.render(scene, camera);
 }
 renderer.setAnimationLoop( animate );
