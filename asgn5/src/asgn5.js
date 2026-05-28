@@ -45,7 +45,6 @@
 
     const loader = new THREE.TextureLoader();
     const rock_normal = loader.load("../resources/textures/sphere/rock_normal.png");
-    rock_normal.colorSpace = THREE.NoColorSpace;
     const rock_ao = loader.load("../resources/textures/sphere/rock_ao.png");
     const rock_diffuse = loader.load("../resources/textures/sphere/rock_diffuse.png");
 
@@ -61,6 +60,21 @@
     });
     const cube = new THREE.Mesh( geometry, material );
     scene.add( cube );
+
+    const portalTexture = new THREE.WebGLRenderTarget(1024, 1024);
+    const portalMat = new THREE.MeshBasicMaterial({
+        map: portalTexture.texture,
+        side: THREE.DoubleSide
+    });
+
+    const planeGeo = new THREE.PlaneGeometry(100,100);
+    planeGeo.attributes.uv2 = planeGeo.attributes.uv;
+    const planeMat = material.clone();
+    planeMat.side = THREE.DoubleSide;
+    const groundPlane = new THREE.Mesh(planeGeo, planeMat);
+    groundPlane.rotation.x = -Math.PI / 2;
+    groundPlane.position.y = -2;
+    scene.add(groundPlane);
 
     gui.add(mapObject, "diffuse_map").name("Diffuse").onChange( value => {
         material.map = value ? rock_diffuse : null;
@@ -106,6 +120,11 @@
 
     function animate( time ) {
         cube.rotation.y = time/1000;
+
+        renderer.setRenderTarget(portalTexture);
+        renderer.render(scene, camera);
+
+        renderer.setRenderTarget(null);
         renderer.render(scene, camera);
     }
     renderer.setAnimationLoop( animate );
