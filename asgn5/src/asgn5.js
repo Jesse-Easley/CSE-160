@@ -23,7 +23,7 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-// camera.position.z = 3;
+camera.position.z = 3;
 
 const cube_loader = new THREE.CubeTextureLoader();
 const skybox = cube_loader.load([
@@ -83,10 +83,6 @@ const ambLight = new THREE.AmbientLight(0x404040, 1.0);
 scene.add(ambLight);
 
 function animate( time ) {
-    camera.position.x = Math.cos(time * 0.0005)*3;
-    camera.position.z = Math.sin(time * 0.0005)*3;
-    camera.lookAt(0, 0, 0);
-
     renderer.render(scene, camera);
 }
 renderer.setAnimationLoop( animate );
