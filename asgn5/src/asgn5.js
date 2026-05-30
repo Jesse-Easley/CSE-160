@@ -12,6 +12,7 @@ const renderer = new THREE.WebGLRenderer({
     stencil: true
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setClearColor('#9A34E3');
 document.body.appendChild(renderer.domElement);
 
@@ -27,6 +28,14 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+
+    const size = Math.min(window.innerWidth, window.innerHeight);
+    for(const portal of portals){
+        portal.portalCam.aspect = window.innerWidth / window.innerHeight;
+        portal.portalCam.updateProjectionMatrix();
+
+        portal.renderTarget.setSize(size, size);
+    }
 });
 
 //
@@ -204,15 +213,16 @@ greenGroundMesh.material.color.set('#7DE334');
 // ─────────────────────────────────────────────────────────────
 //
 
-const portal1 = new Portal(camera, scene);
-portal1.portalSurface.position.y = 1;
-portal1.portalSurface.position.x = 2;
+const portal1 = new Portal(1, 2, camera, scene, renderer);
+portal1.position.y = 1;
+portal1.position.x = 2;
 
-const portal2 = new Portal(camera, scene);
-portal2.portalSurface.position.y = 1;
-portal2.portalSurface.position.x = -2;
+const portal2 = new Portal(1, 2, camera, scene, renderer);
+portal2.position.y = 1;
+portal2.position.x = -2;
 
 Portal.linkPortals(portal1, portal2);
+
 let portals = [];
 portals.push(portal1);
 portals.push(portal2);
@@ -230,8 +240,10 @@ function render(time) {
 
     updateMovement(delta);
 
-    portal1.render(renderer, scene);
-    portal2.render(renderer, scene);
+    for(const portal of portals){
+        portal.updateCamera();
+        portal.render(renderer, scene);
+    }
     // portalCube.rotation.y = time / 1000;
     // portalCube.rotation.x = time / 1000;
 
