@@ -6,10 +6,38 @@ export class Portal{
         this.portalCam = new THREE.PerspectiveCamera(this.playerCam.fov, this.playerCam.aspect, 0.1, 100);
         this.linkedPortal = null;
 
+
+        //create renderTarget and assign portal texture
+        const size = Math.min(window.innerWidth, window.innerHeight);
+        this.renderTarget = new THREE.WebGLRenderTarget(
+            size,
+            size,
+            {
+                samples: 12
+            }
+        );
+        this.renderTarget.texture.minFilter = THREE.LinearFilter;
+        this.renderTarget.texture.magFilter = THREE.LinearFilter;
+
+        let portalMat = new THREE.ShaderMaterial({
+            side: THREE.DoubleSide, 
+            uniforms: {
+            portalTexture: { value: this.renderTarget.texture }
+        }});
+        const loader = new THREE.FileLoader();
+        Promise.all([
+            loader.loadAsync('../resources/shaders/portalVertex.glsl'),
+            loader.loadAsync('../resources/shaders/portalFragment.glsl')
+        ]).then(([vertex, fragment]) => {
+            portalMat.vertexShader = vertex;
+            portalMat.fragmentShader = fragment;
+            portalMat.needsUpdate = true;
+        });
+
+        
+
         //create portal plane
-        this.portalSurface = new THREE.Mesh(new THREE.PlaneGeometry(), new THREE.MeshBasicMaterial({
-            side: THREE.DoubleSide
-        }));
+        this.portalSurface = new THREE.Mesh(new THREE.PlaneGeometry(), portalMat);
         this.portalSurface.layers.set(1);
         this.portalCam.layers.enableAll();
         this.portalCam.layers.disable(1);
@@ -17,14 +45,6 @@ export class Portal{
         scene.add(this.portalSurface);
         //create stencil mask
         //create portal frame
-
-        //create renderTarget and assign portal texture
-        this.renderTarget = new THREE.WebGLRenderTarget(
-            window.innerWidth,
-            window.innerHeight
-        );
-        this.portalSurface.material.map = this.renderTarget.texture;
-        this.portalSurface.material.needsUpdate = true;
     }
 
     static linkPortals(portal1, portal2){

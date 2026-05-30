@@ -194,7 +194,6 @@ redGroundMesh.position.x = -7.5;
 redGroundMesh.rotation.x = -Math.PI/2;
 redGroundMesh.material.color.set('#E34234');
 
-
 greenGroundMesh.position.x = 7.5;
 greenGroundMesh.rotation.x = -Math.PI/2;
 greenGroundMesh.material.color.set('#7DE334');
@@ -214,6 +213,9 @@ portal2.portalSurface.position.y = 1;
 portal2.portalSurface.position.x = -2;
 
 Portal.linkPortals(portal1, portal2);
+let portals = [];
+portals.push(portal1);
+portals.push(portal2);
 
 //
 // ─────────────────────────────────────────────────────────────
