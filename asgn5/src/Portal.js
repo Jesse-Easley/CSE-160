@@ -4,7 +4,8 @@ export class Portal extends THREE.Object3D{
     constructor(width = 1, height = 1, playerCam, scene, renderer){
         super();
 
-        scene.add(this);
+        this.width = width;
+        this.height = height;
 
         this.playerCam = playerCam;
         this.portalCam = new THREE.PerspectiveCamera(this.playerCam.fov, this.playerCam.aspect, 0.1, 100);
@@ -43,25 +44,27 @@ export class Portal extends THREE.Object3D{
             portalMat.vertexShader = vertex;
             portalMat.fragmentShader = fragment;
             portalMat.needsUpdate = true;
+            portalMat.side = THREE.DoubleSide;
         });
 
-        //create portal plane
-        this.portalSurface = new THREE.Mesh(new THREE.PlaneGeometry(width, height), portalMat);
-        this.portalSurface.layers.set(1);
+        //create portal surface
+        const portalDepth = this.playerCam.near + 0.002; //to avoid flicker when moving through portal
+        this.portalSurface = new THREE.Mesh(new THREE.BoxGeometry(width, height, portalDepth), portalMat);
+        this.portalSurface.layers.set(1); 
         this.portalCam.layers.disable(1);
                 
         //create portal frame
-        const frameThickness = 0.07; //border width
-        const frameDepth = 0.1;     //how far the frame sticks out
+        //group for frames
+        this.portalFrame = new THREE.Group();
+
+        const frameThickness = 0.07;             //border width
+        const frameDepth = 0.1 + portalDepth;    //how far the frame sticks out
 
         const frameMat = new THREE.MeshStandardMaterial({
             color: 0x222222,
-            metalness: 0.4,
+            metalness: 0.6,
             roughness: 0.3
         });
-
-        //group for frames
-        this.portalFrame = new THREE.Group();
 
         //top bar
         const topBar = new THREE.Mesh(
@@ -87,13 +90,85 @@ export class Portal extends THREE.Object3D{
         rightBar.position.set((width + frameThickness) / 2, 0, 0);
         this.portalFrame.add(rightBar);
 
+        //add portal components to scene
         this.add(this.portalSurface);
         this.add(this.portalFrame);
+        scene.add(this);
+
+        //setup bounding box for teleportation
+        this.tracked = new Map();
+        this.aabb = new THREE.Box3();
+        this.trackingDepth = 0.3;
+    }
+
+    computeAABB(){
+        this.aabb.setFromObject(this.portalSurface);
+        this.aabb.expandByScalar(this.trackingDepth);
+    }
+
+    //non axis aligned portals may have weird collision boxes due to using AABB
+    isObjectNear(object) {
+        return this.aabb.containsPoint(object.position);
+    }
+
+    startTracking(object) {
+        const portalPos = new THREE.Vector3().setFromMatrixPosition(this.portalSurface.matrixWorld);
+        const normal = new THREE.Vector3();
+        this.portalSurface.getWorldDirection(normal);
+
+        const toObj = object.position.clone().sub(portalPos);
+        const side = Math.sign(toObj.dot(normal));
+
+        this.tracked.set(object, side);
+    }
+
+    updateTrackedObjects() {
+        for (const [object, previousSide] of this.tracked.entries()) {
+
+            //if object moved far away, stop tracking
+            if (!this.isObjectNear(object)) {
+                this.tracked.delete(object);
+                continue;
+            }
+
+            //compute current side
+            const portalPos = new THREE.Vector3().setFromMatrixPosition(this.portalSurface.matrixWorld);
+            const normal = new THREE.Vector3();
+            this.portalSurface.getWorldDirection(normal);
+
+            const toObj = object.position.clone().sub(portalPos);
+            const currentSide = Math.sign(toObj.dot(normal));
+
+            //detect crossing
+            if (currentSide !== previousSide) {
+                this.teleportObject(object);
+                this.tracked.delete(object);
+                continue;
+            }
+
+            //update side
+            this.tracked.set(object, currentSide);
+        }
+    }
+
+    teleportObject(object) {
+        //get correct relative transform
+        const newMatrix = new THREE.Matrix4()
+                                   .copy(this.linkedPortal.portalSurface.matrixWorld)
+                                   .multiply(this.portalSurface.matrixWorld.clone().invert())
+                                   .multiply(object.matrixWorld);
+
+        newMatrix.decompose(object.position, object.quaternion, object.scale);
+        object.updateMatrixWorld(true);
     }
 
     static linkPortals(portal1, portal2){
         portal1.linkedPortal = portal2;
         portal2.linkedPortal = portal1;
+
+        //eliminates some flickering when teleporting
+        portal2.portalSurface.rotation.y = Math.PI;
+        portal2.rotation.y = -Math.PI;
     }
 
     //called every frame BEFORE rendering portalCams
@@ -104,7 +179,7 @@ export class Portal extends THREE.Object3D{
 
         //calculate relative transform of portal camera
         let portalCamTransform = new THREE.Matrix4().copy(this.linkedPortal.portalSurface.matrixWorld)
-                                                    .multiply(this.portalSurface.matrixWorld.invert())
+                                                    .multiply(this.portalSurface.matrixWorld.clone().invert())
                                                     .multiply(this.playerCam.matrixWorld);
         
         //set portal camera transforms
@@ -114,7 +189,6 @@ export class Portal extends THREE.Object3D{
             this.portalCam.scale
         );
         this.portalCam.updateMatrixWorld(true);
-    
 
         //calculate clipping plane normal and position
         const position = new THREE.Vector3().setFromMatrixPosition(this.linkedPortal.portalSurface.matrixWorld);
@@ -123,9 +197,9 @@ export class Portal extends THREE.Object3D{
         normal.normalize();
 
         //determine if player is in front or behind portal
-        const portalToCam = new THREE.Vector3().subVectors(this.portalCam.position, position);
-        if (portalToCam.dot(normal) > 0) {
-            normal.negate(); //flips clipping plane
+        const playerToPortal = new THREE.Vector3().subVectors(this.playerCam.position, position);
+        if (playerToPortal.dot(normal) > 0) {
+            normal.negate();
         }
 
         //offset to fix gap

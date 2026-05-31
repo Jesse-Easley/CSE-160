@@ -19,7 +19,7 @@ document.body.appendChild(renderer.domElement);
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
-    0.1,
+    0.01,
     100
 );
 camera.position.set(0, 1.6, 5);
@@ -39,21 +39,11 @@ window.addEventListener('resize', () => {
 });
 
 //
-// ─────────────────────────────────────────────────────────────
-//   CONTROLS
-// ─────────────────────────────────────────────────────────────
+// controls
 //
 
-//orbit controls
-// const orbit = new OrbitControls(camera, renderer.domElement);
-// orbit.enableDamping = true;
-// orbit.dampingFactor = 0.1;
-// orbit.minDistance = 2;
-// orbit.maxDistance = 20;
-// orbit.update();
-
 //pointer lock controls
-const controls = new PointerLockControls(camera, renderer.donElement);
+const controls = new PointerLockControls(camera, renderer.domElement);
 renderer.domElement.addEventListener('click', () => renderer.domElement.requestPointerLock());
 const keys = {
     w: false,
@@ -110,9 +100,7 @@ function updateMovement(delta) {
 }
 
 //
-// ─────────────────────────────────────────────────────────────
-//   LIGHTING
-// ─────────────────────────────────────────────────────────────
+//   lighting
 //
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.4));
@@ -122,9 +110,7 @@ dir.position.set(5, 10, 5);
 scene.add(dir);
 
 //
-// ─────────────────────────────────────────────────────────────
-//   WORLD GEOMETRY
-// ─────────────────────────────────────────────────────────────
+// world geometry
 //
 
 for(let i = 0; i < 10; i++){
@@ -208,9 +194,7 @@ greenGroundMesh.rotation.x = -Math.PI/2;
 greenGroundMesh.material.color.set('#7DE334');
 
 //
-// ─────────────────────────────────────────────────────────────
-//   PORTAL STUFF (THINKING WITH PORTALS IS MELTING MY BRAIN)
-// ─────────────────────────────────────────────────────────────
+// portal stuff (THINKING WITH PORTALS IS MELTING MY BRAIN)
 //
 
 const portal1 = new Portal(1, 2, camera, scene, renderer);
@@ -228,10 +212,10 @@ portals.push(portal1);
 portals.push(portal2);
 
 //
-// ─────────────────────────────────────────────────────────────
-//   ANIMATION LOOP
-// ─────────────────────────────────────────────────────────────
+// animation loop
 //
+const teleportObjects = [];
+teleportObjects.push(camera);
 
 let last = 0;
 function render(time) {
@@ -239,13 +223,21 @@ function render(time) {
     last = time;
 
     updateMovement(delta);
+    camera.updateMatrixWorld(true);
 
-    for(const portal of portals){
+    for (const portal of portals) {
+        portal.computeAABB(); //used for moving portals
+
+        for (const obj of teleportObjects) {
+            if (!portal.tracked.has(obj) && portal.isObjectNear(obj)) {
+                portal.startTracking(obj);
+            }
+        }
+
+        portal.updateTrackedObjects();
         portal.updateCamera();
         portal.render(renderer, scene);
     }
-    // portalCube.rotation.y = time / 1000;
-    // portalCube.rotation.x = time / 1000;
 
     camera.layers.enableAll();
     renderer.render(scene, camera);
