@@ -5,7 +5,9 @@ export class Portal extends THREE.Object3D{
         super();
 
         this.width = width;
-        this.height = height;
+        this.height = height + 0.01;
+
+        this.position.y = (height + 0.01) / 2; //so portal is placed relative to it's bottom (offset slightly to avoid portal threshold being visible)
 
         this.playerCam = playerCam;
         this.portalCam = new THREE.PerspectiveCamera(this.playerCam.fov, this.playerCam.aspect, 0.1, 100);
@@ -36,10 +38,10 @@ export class Portal extends THREE.Object3D{
         }});
         
         //load portal shaders
-        const loader = new THREE.FileLoader();
+        const shaderLoader = new THREE.FileLoader().setPath('../resources/shaders/');
         Promise.all([
-            loader.loadAsync('../resources/shaders/portalVertex.glsl'),
-            loader.loadAsync('../resources/shaders/portalFragment.glsl')
+            shaderLoader.loadAsync('portalVertex.glsl'),
+            shaderLoader.loadAsync('portalFragment.glsl')
         ]).then(([vertex, fragment]) => {
             portalMat.vertexShader = vertex;
             portalMat.fragmentShader = fragment;
@@ -93,7 +95,6 @@ export class Portal extends THREE.Object3D{
         //add portal components to scene
         this.add(this.portalSurface);
         this.add(this.portalFrame);
-        scene.add(this);
 
         //setup bounding box for teleportation
         this.tracked = new Map();
@@ -106,7 +107,7 @@ export class Portal extends THREE.Object3D{
         this.aabb.expandByScalar(this.trackingDepth);
     }
 
-    //non axis aligned portals may have weird collision boxes due to using AABB
+    //non axis aligned portals may have weird detection boxes aabb being axis aligned
     isObjectNear(object) {
         return this.aabb.containsPoint(object.position);
     }
@@ -167,8 +168,8 @@ export class Portal extends THREE.Object3D{
         portal2.linkedPortal = portal1;
 
         //eliminates some flickering when teleporting
-        portal2.portalSurface.rotation.y = Math.PI;
-        portal2.rotation.y = -Math.PI;
+        // portal2.portalSurface.rotation.y = Math.PI;
+        // portal2.rotation.y = -Math.PI;
     }
 
     //called every frame BEFORE rendering portalCams
