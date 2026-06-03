@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export class Portal extends THREE.Object3D{
-    constructor(width = 1, height = 1, playerCam, scene, renderer){
+    constructor(width = 1, height = 1, playerCam, sourceScene, targetScene, renderer, onTeleport){
         super();
 
         this.width = width;
@@ -12,7 +12,12 @@ export class Portal extends THREE.Object3D{
         this.playerCam = playerCam;
         this.portalCam = new THREE.PerspectiveCamera(this.playerCam.fov, this.playerCam.aspect, 0.1, 100);
         this.linkedPortal = null;
-        
+
+        this.sourceScene = sourceScene;
+        this.targetScene = targetScene;
+
+        this.onTeleport = onTeleport;
+
         this.clippingPlane = new THREE.Plane();
         renderer.localClippingEnabled = true;
 
@@ -23,6 +28,8 @@ export class Portal extends THREE.Object3D{
             size.x,
             size.y,
             {
+                type: THREE.HalfFloatType,
+                format: THREE.RGBAFormat,
                 samples: 12
             }
         );
@@ -50,7 +57,7 @@ export class Portal extends THREE.Object3D{
         });
 
         //create portal surface
-        const portalDepth = this.playerCam.near + 0.002; //to avoid flicker when moving through portal
+        const portalDepth = this.playerCam.near + 0.002; //to help avoid flicker when moving through portal
         this.portalSurface = new THREE.Mesh(new THREE.BoxGeometry(width, height, portalDepth), portalMat);
         this.portalSurface.layers.set(1); 
         this.portalCam.layers.disable(1);
@@ -161,6 +168,15 @@ export class Portal extends THREE.Object3D{
 
         newMatrix.decompose(object.position, object.quaternion, object.scale);
         object.updateMatrixWorld(true);
+
+        if(object == this.playerCam){
+            this.sourceScene.remove(this.playerCam);
+            this.targetScene.add(this.playerCam);
+            
+            if (this.onTeleport) {
+                this.onTeleport(this.targetScene);
+            }
+        }
     }
 
     static linkPortals(portal1, portal2){
@@ -212,11 +228,11 @@ export class Portal extends THREE.Object3D{
     }
 
     //called every frame before main/player camera is rendered
-    render(renderer, scene){
+    render(renderer){
         renderer.clippingPlanes = [this.clippingPlane];
 
         renderer.setRenderTarget(this.renderTarget);
-        renderer.render(scene, this.portalCam);
+        renderer.render(this.targetScene, this.portalCam);
         renderer.setRenderTarget(null);
 
         renderer.clippingPlanes = [];
