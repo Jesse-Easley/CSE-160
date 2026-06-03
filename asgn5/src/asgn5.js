@@ -499,8 +499,8 @@ function render(time) {
     updateMovement(delta);
     camera.updateMatrixWorld(true);
 
+    //update sun/planet movement
     sunMesh.position.set(300*Math.cos(time/1000 / 10), 300, 300*Math.sin(Math.sin(time/1000 / 10)));
-
     if(red_ring_planet){
         let orbit_r = 300;
         
@@ -510,7 +510,6 @@ function render(time) {
         red_ring_planet.rotation.z += delta * .08;
         red_ring_planet.rotation.y += delta * .08;
     }
-
     if(earthlike_planet){
         let orbit_r = 100;
         
@@ -520,8 +519,9 @@ function render(time) {
 
     }
 
+    //render portals
     for (const portal of portals) {
-        portal.computeAABB(); //used for moving portals
+        portal.computeAABB();
 
         for (const obj of teleportObjects) {
             if (!portal.tracked.has(obj) && portal.isObjectNear(obj)) {
