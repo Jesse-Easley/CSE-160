@@ -169,13 +169,8 @@ export class Portal extends THREE.Object3D{
         newMatrix.decompose(object.position, object.quaternion, object.scale);
         object.updateMatrixWorld(true);
 
-        if(object == this.playerCam){
-            this.sourceScene.remove(this.playerCam);
-            this.targetScene.add(this.playerCam);
-            
-            if (this.onTeleport) {
-                this.onTeleport(this.targetScene);
-            }
+        if (this.onTeleport) {
+            this.onTeleport(this.targetScene);
         }
     }
 

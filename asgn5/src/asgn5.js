@@ -216,7 +216,17 @@ mainRoomMesh.position.y = 1.5; //so bottom plane aligns with y = 0;
 mainRoom.add(mainRoomMesh);
 
 //create portal
-const mainSpacePortal = new Portal(1, 2, camera, labScene, planetScene, renderer, (newScene) => { currentScene = newScene; });
+const mainSpacePortal = new Portal(1,
+    2,
+    camera,
+    labScene,
+    planetScene,
+    renderer,
+    (newScene) => {
+        camera.parent.remove(camera);
+        newScene.add(camera);
+        currentScene = newScene;
+    });
 mainRoom.add(mainSpacePortal);
 portals.push(mainSpacePortal);
 
