@@ -375,7 +375,17 @@ const planetGroundMesh = new THREE.Mesh(planetGroundGeo, planetGroundMat);
 planetGroundMesh.rotation.x = -Math.PI/2;
 planet.add(planetGroundMesh);
 
-const otherPortal = new Portal(1, 2, camera, planetScene, labScene, renderer, (newScene) => { currentScene = newScene; });
+const otherPortal = new Portal(1,
+    2,
+    camera,
+    planetScene,
+    labScene,
+    renderer,
+    (newScene) => {
+        camera.parent.remove(camera);
+        newScene.add(camera);
+        currentScene = newScene;
+    });
 portals.push(otherPortal);
 planet.add(otherPortal);
 
